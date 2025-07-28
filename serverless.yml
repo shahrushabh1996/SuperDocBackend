@@ -13,7 +13,7 @@ provider:
     NODE_ENV: ${self:provider.stage}
     MONGO_URI: ${env:MONGO_URI}
     JWT_SECRET: ${env:JWT_SECRET}
-    PORT: ${env:PORT, '3000'}
+    PORT: ${env:PORT, '3001'}
 
 plugins:
   - serverless-offline
@@ -33,7 +33,7 @@ functions:
 
 custom:
   serverless-offline:
-    httpPort: ${env:PORT, '3000'}
+    httpPort: ${env:PORT, '3001'}
     lambdaPort: 3002
     websocketPort: 3001
     noPrependStageInUrl: true

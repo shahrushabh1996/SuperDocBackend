@@ -4,7 +4,7 @@ const axios = require('axios');
 const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODc4YTA3NjExMWVhZDE4YThiZmY5N2EiLCJtb2JpbGUiOiI3OTkwMDg5OTg0Iiwib3JnYW5pemF0aW9uSWQiOiI2ODc4YTA3NjExMWVhZDE4YThiZmY5N2QiLCJpYXQiOjE3NTMxMTQzNTIsImV4cCI6MTc1MzIwMDc1Mn0.yjn2kNIsOXf10WGwyCciMw3W-L2fbGmxXfPmIGX-l-8';
 
 // Base URL for your API
-const BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';
 
 // Create axios instance with default headers
 const api = axios.create({
