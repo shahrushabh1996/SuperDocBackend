@@ -112,7 +112,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3001",
+      "value": "http://admin.sugary.live:3001",
       "type": "string"
     },
     {
