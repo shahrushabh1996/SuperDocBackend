@@ -1,0 +1,130 @@
+{
+  "dealTemplateApproved": {
+    "action": "Deal template approved",
+    "content": "Your deal template (ID: {{templateId}}) has been approved."
+  },
+  "dealTemplateRejected": {
+    "action": "Deal template rejected",
+    "content": "Your deal template (ID: {{templateId}}) has been rejected."
+  },
+  "corporatePurchase": {
+    "action": "Corporate voucher purchase",
+    "content": "Congratulations! {{corporateName}} has bought vouchers from you. Transaction ID: {{transactionId}}."
+  },
+  "accountCredited": {
+    "action": "Account credited",
+    "content": "₹{{amount}} has been credited to your account against transaction ID(s): {{transactionIds}}."
+  },
+  "brandLevelActivated": {
+    "action": "Brand level activated",
+    "content": "Congratulations! Brand Level {{brandLevel}} has been activated on your account. Your next renewal is on {{renewalDate}}."
+  },
+  "brandLevelExpiring": {
+    "action": "Brand level expiring",
+    "content": "Brand Level {{brandLevel}} will expire on {{expiryDate}}. Please renew with the admin to continue services."
+  },
+  "brandLevelExpired": {
+    "action": "Brand level expired",
+    "content": "Brand Level {{brandLevel}} has expired. Please renew the level to continue services."
+  },
+  "brandLevelDowngraded": {
+    "action": "Brand level downgraded",
+    "content": "Your Brand Level has been downgraded to {{brandLevel}}."
+  },
+  "brandLevelDowngradedActionRequired": {
+    "action": "Brand level downgraded – action required",
+    "content": "Your Brand Level was downgraded on {{downgradeDate}}. Please delete {{branchesToDelete}} branch(es) / {{membersToDelete}} JFY member(s) to prevent account blocking."
+  },
+  "couponsCredited": {
+    "action": "Coupons credited",
+    "content": "{{couponCount}} coupon(s) have been credited to your account from brand {{brandName}}."
+  },
+  "couponsAboutToExpire": {
+    "action": "Coupons about to expire",
+    "content": "{{couponCount}} coupon(s) will expire on {{expiryDateTime}}. Please allocate or use them to prevent expiration."
+  },
+  "couponsAllocatedToEmployee": {
+    "action": "Coupons allocated to employee",
+    "content": "{{couponCount}} coupon(s) have been allocated to employee {{employeeName}} on {{allocationDateTime}}."
+  },
+  "brandCreated": {
+    "action": "Brand created",
+    "content": "Brand {{brandName}} was successfully created on {{creationDateTime}}."
+  },
+  "userAddedToOperations": {
+    "action": "User added to operations",
+    "content": "{{userName}} has been added to Sugary Operations."
+  },
+  "userRemovedFromOperations": {
+    "action": "User removed from operations",
+    "content": "{{userName}} has been removed from Sugary Operations / marked inactive."
+  },
+  "voucherTemplatesAwaitingApproval": {
+    "action": "Voucher templates awaiting approval",
+    "content": "{{templateCount}} voucher template(s) have been awaiting approval for {{hoursPending}} hour(s)."
+  },
+  "dealLevelAssigned": {
+    "action": "Deal level assigned",
+    "content": "Deal Level {{dealLevel}} has been assigned to branch {{branchName}} of brand {{brandName}}. Transaction ID: {{transactionId}}."
+  },
+  "brandLevelAssigned": {
+    "action": "Brand level assigned",
+    "content": "Brand Level {{brandLevel}} has been assigned to brand {{brandName}}. Transaction ID: {{transactionId}}."
+  },
+  "employeeReimbursed": {
+    "action": "Employee reimbursed",
+    "content": "Employee {{employeeName}} has been reimbursed ₹{{amount}} via transaction ID {{transactionId}}."
+  },
+  "brandWelcome": {
+    "action": "Brand welcome",
+    "content": "Hey {{userName}}! Welcome to Sugary. Your brand account has been created."
+  },
+  "firstTimePasscode": {
+    "action": "First-time passcode",
+    "content": "Hey {{userName}}, your first-time login passcode is {{passcode}}."
+  },
+  "unreadNotifications": {
+    "action": "Unread notifications",
+    "content": "Hey {{userName}}, you have {{notificationCount}} unread notification(s) waiting in your account."
+  },
+  "passwordChanged": {
+    "action": "Password changed",
+    "content": "Hey {{userName}}, your password has been successfully changed! If you did not request this, please contact support."
+  },
+  "brandWelcomeSetPassword": {
+    "action": "Brand welcome – set password",
+    "content": "Hey {{userName}}! Welcome to Sugary. Your brand account has been created. Please click the following link to set your password: {{passwordLink}}"
+  },
+  "corporatePasswordChanged": {
+    "action": "Corporate password changed",
+    "content": "Your password for your Sugary corporate account was recently changed."
+  },
+  "newCardAdded": {
+    "action": "New card added",
+    "content": "A new card has been added to your corporate account."
+  },
+  "vouchersCredited": {
+    "action": "Vouchers credited",
+    "content": "Hey {{userName}}! Congratulations—{{voucherCount}} voucher(s) have been credited to your account via transaction ID {{transactionId}}."
+  },
+  "weeklyTransactionSummary": {
+    "action": "Weekly transaction summary",
+    "content": "Hey {{userName}}, please find the weekly transaction summary for your corporate account number {{accountNumber}}."
+  },
+  "VOUCHER_PURCHASED": {
+    "title": "Voucher Purchased",
+    "message": "Your voucher purchase was successful."
+  },
+  "voucherRedeemed": {
+    "title": "Voucher Redeemed",
+    "message": "Your voucher has been successfully redeemed."
+  },
+  "paymentReceived": {
+    "title": "Payment Received",
+    "message": "We have received your payment successfully."
+  },
+  "orderConfirmed": {
+    "title": "Order Confirmed",
+    "message": "Your order has been confirmed and is being processed."
+  }
+}

@@ -1,0 +1,4399 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Your API Title",
+    "version": "1.0.0",
+    "description": "API documentation for your application"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Branch": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password",
+          "brandId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the branch"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the branch"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email for the branch login"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "Password for the branch login (only required on create)"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "ID of the parent brand"
+          },
+          "address": {
+            "type": "string",
+            "description": "Branch address"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "pincode": {
+            "type": "string"
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Point"
+                ],
+                "default": "Point"
+              },
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "description": [
+                  "longitude",
+                  "latitude"
+                ]
+              }
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "description": "Approval status"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Branch active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Branch creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Branch last update timestamp"
+          }
+        },
+        "example": {
+          "name": "Main Street Branch",
+          "email": "main.branch@example.com",
+          "brandId": "60c72b1f9b1e8a001c8e4d6a",
+          "address": "123 Main St",
+          "city": "Anytown",
+          "state": "CA",
+          "pincode": "12345",
+          "location": {
+            "type": "Point",
+            "coordinates": [
+              -73.935242,
+              40.73061
+            ]
+          },
+          "status": "pending",
+          "isActive": true
+        }
+      },
+      "Category": {
+        "type": "object",
+        "required": [
+          "name",
+          "brandId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the category"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "ID of the brand this category belongs to"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the category"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description for the category"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Category active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Category creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Category last update timestamp"
+          }
+        },
+        "example": {
+          "brandId": "60c72b1f9b1e8a001c8e4d6a",
+          "name": "Electronics",
+          "description": "Gadgets and consumer electronics",
+          "isActive": true
+        }
+      },
+      "Corporate": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password",
+          "address"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the corporate entity"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the corporate entity"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email for the corporate login"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "Password for the corporate login (only required on create)"
+          },
+          "address": {
+            "type": "string",
+            "description": "Address of the corporate entity"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "pincode": {
+            "type": "string"
+          },
+          "logo": {
+            "type": "string",
+            "description": "URL of the corporate logo"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Corporate active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "example": {
+          "name": "Global Corp Ltd.",
+          "email": "admin@globalcorp.com",
+          "address": "456 Corporate Blvd",
+          "city": "Metropolis",
+          "state": "NY",
+          "pincode": "98765",
+          "logo": "https://example.com/gclogo.png",
+          "isActive": true
+        }
+      },
+      "DealLevel": {
+        "type": "object",
+        "required": [
+          "name",
+          "dealTemplateId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the deal level"
+          },
+          "dealTemplateId": {
+            "type": "string",
+            "description": "ID of the associated deal template"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the deal level (e.g., Gold, Tier 1)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the deal level"
+          },
+          "minQTY": {
+            "type": "number",
+            "description": "Minimum quantity for this level"
+          },
+          "maxQTY": {
+            "type": "number",
+            "description": "Maximum quantity for this level"
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "description": "Price associated with this deal level"
+          },
+          "discount": {
+            "type": "number",
+            "format": "float",
+            "description": "Discount percentage/amount for this level"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Deal level active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "example": {
+          "dealTemplateId": "67dd43049506b7d658781da1",
+          "name": "Bulk Purchase",
+          "description": "Discount for buying over 100 units",
+          "minQTY": 101,
+          "price": 90,
+          "isActive": true
+        }
+      },
+      "DealTemplate": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "brandId",
+          "branchIds",
+          "termsAndConditions",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the deal template"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "ID of the brand this template belongs to"
+          },
+          "branchIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of branch IDs where this template is applicable"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the deal template"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the deal template"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL of an image associated with the template"
+          },
+          "termsAndConditions": {
+            "type": "string",
+            "description": "Terms and conditions for deals created from this template"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "discount",
+              "BOGO",
+              "free_item"
+            ],
+            "description": "Type of deal (e.g., discount, buy-one-get-one)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "description": "Approval status of the template"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the template is active"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "example": {
+          "brandId": "60c72b1f9b1e8a001c8e4d6a",
+          "branchIds": [
+            "60c72b2f9b1e8a001c8e4d7b",
+            "60c72b3f9b1e8a001c8e4d8c"
+          ],
+          "name": "Weekend Special Discount",
+          "description": "15% off on all electronics",
+          "termsAndConditions": "Valid on weekends only. Cannot be combined with other offers.",
+          "type": "discount",
+          "status": "pending",
+          "isActive": true
+        }
+      },
+      "Invoice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the invoice record"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of the user who submitted the invoice"
+          },
+          "branchId": {
+            "type": "string",
+            "description": "ID of the branch associated with the invoice (if applicable)"
+          },
+          "invoiceNumber": {
+            "type": "string",
+            "description": "Invoice number extracted from the image"
+          },
+          "invoiceDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Invoice date extracted from the image"
+          },
+          "totalAmount": {
+            "type": "number",
+            "format": "float",
+            "description": "Total amount extracted from the invoice"
+          },
+          "inputAmount": {
+            "type": "number",
+            "format": "float",
+            "description": "Amount entered by the user for verification"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether the input amount matched the extracted amount"
+          },
+          "ocrData": {
+            "type": "object",
+            "description": "Raw data returned from the OCR service"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "URL where the invoice image is stored (if saved)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "verified",
+              "failed",
+              "error"
+            ],
+            "description": "Verification status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the verification was attempted"
+          }
+        },
+        "example": {
+          "id": "67e0f1b1d1a7f0b1c8e4d9a1",
+          "userId": "67d95b3d2108afa74053c4ed",
+          "branchId": "67dd3fb5d5708a12d787bfaf",
+          "invoiceNumber": "INV-12345",
+          "invoiceDate": "2024-05-15",
+          "totalAmount": 150.75,
+          "inputAmount": 150.75,
+          "isVerified": true,
+          "status": "verified"
+        }
+      },
+      "IssueVoucher": {
+        "type": "object",
+        "required": [
+          "userId",
+          "voucherTemplateId",
+          "branchId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the issued voucher record"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of the user receiving the voucher"
+          },
+          "voucherTemplateId": {
+            "type": "string",
+            "description": "ID of the voucher template being issued"
+          },
+          "branchId": {
+            "type": "string",
+            "description": "ID of the branch issuing the voucher"
+          },
+          "voucherCode": {
+            "type": "string",
+            "description": "The unique code generated for this specific issued voucher"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "issued",
+              "redeemed",
+              "expired",
+              "cancelled"
+            ],
+            "description": "Status of the issued voucher"
+          },
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the voucher was issued"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the voucher expires"
+          },
+          "redeemedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the voucher was redeemed (if applicable)"
+          }
+        },
+        "example": {
+          "userId": "67d95b3d2108afa74053c4ed",
+          "voucherTemplateId": "67e1f2c2d2b8f1c1d9e5e0a2",
+          "branchId": "67dd3fb5d5708a12d787bfaf",
+          "voucherCode": "ABC-123-XYZ",
+          "status": "issued",
+          "issuedAt": "2024-05-16T10:00:00Z",
+          "expiresAt": "2024-06-16T10:00:00Z"
+        }
+      },
+      "Product": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "price",
+          "categoryId",
+          "subCategoryId",
+          "brandId",
+          "branchId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the product"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "ID of the brand this product belongs to"
+          },
+          "branchId": {
+            "type": "string",
+            "description": "ID of the branch this product belongs to"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "ID of the main category"
+          },
+          "subCategoryId": {
+            "type": "string",
+            "description": "ID of the sub-category"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the product"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the product"
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "description": "Price of the product"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of image URLs for the product"
+          },
+          "stock": {
+            "type": "number",
+            "description": "Current stock quantity"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Product active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "example": {
+          "brandId": "60c72b1f9b1e8a001c8e4d6a",
+          "branchId": "67dd3fb5d5708a12d787bfaf",
+          "categoryId": "67e2f3d3e3c9f2d2e0f6f1b3",
+          "subCategoryId": "67e2f4e4f4d0f3e3f1g7g2c4",
+          "name": "Wireless Noise-Cancelling Headphones",
+          "description": "High-quality over-ear headphones with active noise cancellation.",
+          "price": 199.99,
+          "images": [
+            "https://example.com/headphone1.jpg",
+            "https://example.com/headphone2.jpg"
+          ],
+          "stock": 50,
+          "isActive": true
+        }
+      },
+      "SubCategory": {
+        "type": "object",
+        "required": [
+          "name",
+          "categoryId",
+          "brandId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the sub-category"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "ID of the brand this sub-category belongs to"
+          },
+          "categoryId": {
+            "type": "string",
+            "description": "ID of the parent category"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the sub-category"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description for the sub-category"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Sub-category active status"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        },
+        "example": {
+          "brandId": "60c72b1f9b1e8a001c8e4d6a",
+          "categoryId": "67e2f3d3e3c9f2d2e0f6f1b3",
+          "name": "Smartphones",
+          "description": "Latest mobile phones",
+          "isActive": true
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "name",
+          "mobile"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the user"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's full name"
+          },
+          "mobile": {
+            "type": "string",
+            "description": "User's mobile number (often used as username)"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "User's email address"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "User's password (write-only)"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date",
+            "description": "User's date of birth"
+          },
+          "profilePic": {
+            "type": "string",
+            "description": "URL of the user's profile picture"
+          },
+          "corporateId": {
+            "type": "string",
+            "description": "ID of the corporate entity the user is linked to (if any)"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive",
+              "pending_verification"
+            ],
+            "description": "User account status"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether the user's mobile/email is verified"
+          },
+          "otp": {
+            "type": "string",
+            "description": "One-time password (temporary, internal use)"
+          },
+          "otpExpires": {
+            "type": "string",
+            "format": "date-time",
+            "description": "OTP expiry time (internal use)"
+          },
+          "securityQuestions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "question": {
+                  "type": "string"
+                },
+                "answer": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Security questions for account recovery"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "SecurityQuestionInput": {
+        "type": "object",
+        "required": [
+          "question",
+          "answer"
+        ],
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string",
+            "description": "User's answer to the security question"
+          }
+        }
+      },
+      "VoucherTemplate": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "brandId",
+          "value",
+          "type",
+          "validityDays"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the voucher template"
+          },
+          "brandId": {
+            "type": "string",
+            "description": "ID of the brand this template belongs to"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the voucher template"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the voucher template"
+          },
+          "termsAndConditions": {
+            "type": "string",
+            "description": "Terms and conditions specific to this voucher template"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "percentage",
+              "fixed_amount"
+            ],
+            "description": "Type of discount (percentage or fixed amount)"
+          },
+          "value": {
+            "type": "number",
+            "format": "float",
+            "description": "The discount value (either percentage or fixed amount based on type)"
+          },
+          "maxValue": {
+            "type": "number",
+            "format": "float",
+            "description": "Maximum discount amount applicable (especially for percentage type)"
+          },
+          "minValue": {
+            "type": "number",
+            "format": "float",
+            "description": "Minimum purchase amount required to use the voucher"
+          },
+          "validityDays": {
+            "type": "number",
+            "description": "Number of days the voucher is valid after being issued"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether the template is active and can be used to issue vouchers"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL for the template image"
+          },
+          "header": {
+            "type": "string",
+            "description": "Header text for the voucher"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "description": "Approval status"
+          }
+        },
+        "example": {
+          "brandId": "60c72b1f9b1e8a001c8e4d6a",
+          "name": "Summer Sale Template",
+          "description": "Get 20% off selected summer collection items.",
+          "termsAndConditions": "Valid for new users only. Minimum purchase $20.",
+          "type": "percentage",
+          "value": 20,
+          "maxValue": 50,
+          "minValue": 20,
+          "validityDays": 60,
+          "isActive": true,
+          "header": "20% Off Summer Items",
+          "image": "https://example.com/summer_voucher.png",
+          "status": "pending"
+        }
+      },
+      "VoucherTransaction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The auto-generated id of the transaction record"
+          },
+          "corporateId": {
+            "type": "string",
+            "description": "ID of the corporate entity associated with the transaction"
+          },
+          "branchId": {
+            "type": "string",
+            "description": "ID of the branch where the transaction occurred"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of the user involved in the transaction"
+          },
+          "voucherId": {
+            "type": "string",
+            "description": "ID of the specific issued voucher used/involved"
+          },
+          "transactionType": {
+            "type": "string",
+            "enum": [
+              "issuance",
+              "redemption",
+              "cancellation",
+              "expiration"
+            ],
+            "description": "Type of voucher transaction"
+          },
+          "amount": {
+            "type": "number",
+            "format": "float",
+            "description": "Value associated with the transaction (e.g., discount applied)"
+          },
+          "transactionDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the transaction"
+          }
+        },
+        "example": {
+          "id": "67e3a4b4c5d1e2f2a1b8c9d0",
+          "corporateId": "60c72b1f9b1e8a001c8e4d6f",
+          "branchId": "67dd3fb5d5708a12d787bfaf",
+          "userId": "67d95b3d2108afa74053c4ed",
+          "voucherId": "67e1f2c2d2b8f1c1d9e5e0a2",
+          "transactionType": "redemption",
+          "amount": 15.5,
+          "transactionDate": "2024-05-16T11:30:00Z"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/branch": {
+      "post": {
+        "summary": "Create a new branch",
+        "tags": [
+          "Branch"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Branch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Branch created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Branch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all branches (with optional filtering/pagination)",
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "brandId",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by brand ID"
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
+            "description": "Filter by approval status"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of branches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Branch"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/branch/{id}": {
+      "get": {
+        "summary": "Get a branch by ID",
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Branch ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Branch data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Branch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Branch not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a branch by ID",
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Branch ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Branch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Branch updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Branch"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID format"
+          },
+          "404": {
+            "description": "Branch not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a branch by ID",
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Branch ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Branch deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Branch not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/branch/status": {
+      "patch": {
+        "summary": "Approve or reject branches in bulk",
+        "tags": [
+          "Branch"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "branchIds",
+                  "status"
+                ],
+                "properties": {
+                  "branchIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Array of Branch IDs to update"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "approved",
+                      "rejected"
+                    ],
+                    "description": "The new status to set"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Branches status updated successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/branch/login": {
+      "post": {
+        "summary": "Login a branch user",
+        "tags": [
+          "Branch"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful, returns token and branch data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "branch": {
+                      "$ref": "#/components/schemas/Branch"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/branch/logout/{id}": {
+      "post": {
+        "summary": "Logout a branch user (Conceptual - Clear token on client)",
+        "tags": [
+          "Branch"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Branch ID of the user logging out"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Logout successful (conceptually)"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/category": {
+      "post": {
+        "summary": "Create a new category",
+        "tags": [
+          "Category"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all categories (with optional filtering)",
+        "tags": [
+          "Category"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "brandId",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by brand ID"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Category"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/category/{id}": {
+      "get": {
+        "summary": "Get a category by ID",
+        "tags": [
+          "Category"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Category not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a category by ID",
+        "tags": [
+          "Category"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Category ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Category"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID format"
+          },
+          "404": {
+            "description": "Category not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a category by ID",
+        "tags": [
+          "Category"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Category not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/corporate": {
+      "post": {
+        "summary": "Create a new corporate entity",
+        "tags": [
+          "Corporate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "email",
+                  "password",
+                  "address"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "pincode": {
+                    "type": "string"
+                  },
+                  "logo": {
+                    "type": "string"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                },
+                "example": {
+                  "name": "Global Corp Ltd.",
+                  "email": "admin@globalcorp.com",
+                  "password": "your_secure_password",
+                  "address": "456 Corporate Blvd",
+                  "city": "Metropolis",
+                  "state": "NY",
+                  "pincode": "98765",
+                  "logo": "https://example.com/gclogo.png",
+                  "isActive": true
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Corporate created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Corporate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a corporate entity (requires ID in body)",
+        "tags": [
+          "Corporate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Corporate"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Corporate updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Corporate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID missing"
+          },
+          "404": {
+            "description": "Corporate not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all corporate entities (with optional filtering)",
+        "tags": [
+          "Corporate"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of corporate entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Corporate"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a corporate entity (requires ID in body)",
+        "tags": [
+          "Corporate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "corporateId"
+                ],
+                "properties": {
+                  "corporateId": {
+                    "type": "string",
+                    "description": "ID of the corporate entity to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Corporate deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input (ID missing)"
+          },
+          "404": {
+            "description": "Corporate not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/corporate/detail": {
+      "post": {
+        "summary": "Get a corporate entity by ID (using POST with ID in body)",
+        "tags": [
+          "Corporate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "corporateId"
+                ],
+                "properties": {
+                  "corporateId": {
+                    "type": "string",
+                    "description": "ID of the corporate entity to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Corporate data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Corporate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (ID missing)"
+          },
+          "404": {
+            "description": "Corporate not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/corporate/change-password": {
+      "patch": {
+        "summary": "Change corporate password",
+        "tags": [
+          "Corporate"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "corporateId",
+                  "oldPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "corporateId": {
+                    "type": "string"
+                  },
+                  "oldPassword": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully"
+          },
+          "400": {
+            "description": "Invalid input or old password incorrect"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Corporate not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/corporate/login": {
+      "post": {
+        "summary": "Login a corporate user",
+        "tags": [
+          "Corporate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful, returns token and corporate data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "corporate": {
+                      "$ref": "#/components/schemas/Corporate"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid credentials or corporate not active"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/corporate/logout": {
+      "post": {
+        "summary": "Logout a corporate user (Conceptual - Clear token on client)",
+        "tags": [
+          "Corporate"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "corporateId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logout successful (conceptually)"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-level": {
+      "post": {
+        "summary": "Create a new deal level",
+        "tags": [
+          "DealLevel"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealLevel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Deal level created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealLevel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a deal level (requires ID in body)",
+        "tags": [
+          "DealLevel"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DealLevel"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deal level updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealLevel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID missing"
+          },
+          "404": {
+            "description": "Deal level not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a deal level (requires ID in body)",
+        "tags": [
+          "DealLevel"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "dealLevelId"
+                ],
+                "properties": {
+                  "dealLevelId": {
+                    "type": "string",
+                    "description": "ID of the deal level to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deal level deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input (ID missing)"
+          },
+          "404": {
+            "description": "Deal level not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-level/all": {
+      "post": {
+        "summary": "Get all deal levels (using POST with filters in body)",
+        "tags": [
+          "DealLevel"
+        ],
+        "requestBody": {
+          "description": "Optional filters (e.g., dealTemplateId, isActive)",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dealTemplateId": {
+                    "type": "string"
+                  },
+                  "isActive": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of deal levels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DealLevel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid filter parameters"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-level/detail": {
+      "post": {
+        "summary": "Get a deal level by ID (using POST with ID in body)",
+        "tags": [
+          "DealLevel"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "dealLevelId"
+                ],
+                "properties": {
+                  "dealLevelId": {
+                    "type": "string",
+                    "description": "ID of the deal level to retrieve"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deal level data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealLevel"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (ID missing)"
+          },
+          "404": {
+            "description": "Deal level not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-template": {
+      "post": {
+        "summary": "Create a new deal template",
+        "tags": [
+          "DealTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DealTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Deal template created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a deal template (requires ID in body)",
+        "tags": [
+          "DealTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/DealTemplate"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deal template updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID missing"
+          },
+          "404": {
+            "description": "Deal template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a deal template (requires ID in body)",
+        "tags": [
+          "DealTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "dealTemplateId"
+                ],
+                "properties": {
+                  "dealTemplateId": {
+                    "type": "string",
+                    "description": "ID of the deal template to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deal template deleted successfully"
+          },
+          "400": {
+            "description": "Invalid input (ID missing)"
+          },
+          "404": {
+            "description": "Deal template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-template/{id}": {
+      "get": {
+        "summary": "Get a deal template by ID",
+        "tags": [
+          "DealTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Deal Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deal template data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DealTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Deal template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-template/by-brand-branch": {
+      "post": {
+        "summary": "Get deal templates by brand and branch (using POST)",
+        "tags": [
+          "DealTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "brandId",
+                  "branchId"
+                ],
+                "properties": {
+                  "brandId": {
+                    "type": "string"
+                  },
+                  "branchId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of deal templates for the specified brand/branch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DealTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (IDs missing or invalid)"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/deal-template/status": {
+      "patch": {
+        "summary": "Approve or reject a deal template (requires ID in body)",
+        "tags": [
+          "DealTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "dealTemplateId",
+                  "status"
+                ],
+                "properties": {
+                  "dealTemplateId": {
+                    "type": "string",
+                    "description": "ID of the deal template to update"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "approved",
+                      "rejected"
+                    ],
+                    "description": "The new status"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deal template status updated successfully"
+          },
+          "400": {
+            "description": "Invalid input (ID or status missing/invalid)"
+          },
+          "404": {
+            "description": "Deal template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/invoice/verify": {
+      "post": {
+        "summary": "Verify an uploaded invoice image against a user-provided amount",
+        "tags": [
+          "Invoice"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "invoiceImage",
+                  "inputAmount"
+                ],
+                "properties": {
+                  "invoiceImage": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The invoice image file to verify."
+                  },
+                  "inputAmount": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "The total amount shown on the invoice (for verification)."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification result (success or failure)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Invoice"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (e.g., missing file, invalid amount)"
+          },
+          "500": {
+            "description": "Server error during processing or OCR"
+          }
+        }
+      }
+    },
+    "/invoice/{id}": {
+      "get": {
+        "summary": "Get invoice verification details by ID",
+        "tags": [
+          "Invoice"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "ID of the invoice record"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Invoice record not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/issue-voucher": {
+      "post": {
+        "summary": "Issue a voucher to a user based on a template",
+        "tags": [
+          "IssueVoucher"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "voucherTemplateId",
+                  "branchId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "description": "ID of the user receiving the voucher"
+                  },
+                  "voucherTemplateId": {
+                    "type": "string",
+                    "description": "ID of the voucher template being issued"
+                  },
+                  "branchId": {
+                    "type": "string",
+                    "description": "ID of the branch issuing the voucher"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Voucher issued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueVoucher"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (missing IDs, validation error)"
+          },
+          "404": {
+            "description": "User, Voucher Template, or Branch not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/product": {
+      "post": {
+        "summary": "Create a new product",
+        "tags": [
+          "Product"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/product/{id}": {
+      "put": {
+        "summary": "Update a product by ID",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Product ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID format"
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a product by ID",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a product by ID",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Product ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Product data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Product not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/product/brand/{id}": {
+      "get": {
+        "summary": "Get all products for a specific brand",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Brand ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products for the brand",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Brand ID format"
+          },
+          "404": {
+            "description": "Brand not found or has no products"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/product/branch/{id}": {
+      "get": {
+        "summary": "Get all products for a specific branch",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Branch ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products for the branch",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Branch ID format"
+          },
+          "404": {
+            "description": "Branch not found or has no products"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/product/category/{id}": {
+      "get": {
+        "summary": "Get all products for a specific category",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products for the category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Category ID format"
+          },
+          "404": {
+            "description": "Category not found or has no products"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/product/subcategory/{id}": {
+      "get": {
+        "summary": "Get all products for a specific sub-category",
+        "tags": [
+          "Product"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Sub-Category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of products for the sub-category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Sub-Category ID format"
+          },
+          "404": {
+            "description": "Sub-Category not found or has no products"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/subcategory": {
+      "post": {
+        "summary": "Create a new sub-category",
+        "tags": [
+          "SubCategory"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sub-category created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all sub-categories (with optional filtering)",
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "categoryId",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by parent category ID"
+          },
+          {
+            "in": "query",
+            "name": "brandId",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by brand ID"
+          },
+          {
+            "in": "query",
+            "name": "isActive",
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Filter by active status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of sub-categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubCategory"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameters"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/subcategory/{id}": {
+      "get": {
+        "summary": "Get a sub-category by ID",
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Sub-category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-category data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Sub-category not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a sub-category by ID",
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Sub-category ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubCategory"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sub-category updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubCategory"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID format"
+          },
+          "404": {
+            "description": "Sub-category not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a sub-category by ID",
+        "tags": [
+          "SubCategory"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Sub-category ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sub-category deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Sub-category not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Create a new user (Register)",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "mobile",
+                  "password"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "mobile": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "dob": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (e.g., missing fields, validation error)"
+          },
+          "409": {
+            "description": "User with this mobile number already exists"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update user profile details (requires userId in body)",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "dob": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "profilePic": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or userId missing"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get user profile by ID",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "User ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login user with mobile/email and password",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mobileOrEmail",
+                  "password"
+                ],
+                "properties": {
+                  "mobileOrEmail": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Invalid credentials or user inactive/not verified"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/login-otp": {
+      "post": {
+        "summary": "Request OTP for login",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mobile"
+                ],
+                "properties": {
+                  "mobile": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "User with this mobile number not found"
+          },
+          "500": {
+            "description": "Server error or error sending OTP"
+          }
+        }
+      }
+    },
+    "/users/verify-otp": {
+      "post": {
+        "summary": "Verify OTP and login user",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mobile",
+                  "otp"
+                ],
+                "properties": {
+                  "mobile": {
+                    "type": "string"
+                  },
+                  "otp": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP verified, login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or invalid/expired OTP"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/resend-otp": {
+      "post": {
+        "summary": "Resend login OTP",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "mobile"
+                ],
+                "properties": {
+                  "mobile": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP resent successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error or error sending OTP"
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "summary": "Logout user (Conceptual - Invalidate token/session)",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logout successful (conceptually)"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/link-corporate": {
+      "patch": {
+        "summary": "Link a user account to a corporate entity",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "corporateId"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "corporateId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User linked to corporate successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User or Corporate not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/status": {
+      "patch": {
+        "summary": "Change user status (e.g., activate/deactivate)",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "status"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "$ref": "#/components/schemas/User/properties/status"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status changed successfully"
+          },
+          "400": {
+            "description": "Invalid input (invalid status)"
+          },
+          "401": {
+            "description": "Unauthorized (not admin?)"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/change-email": {
+      "patch": {
+        "summary": "Change user's email address (may require verification)",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "newEmail"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "newEmail": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email change initiated (or completed if no verification)"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "409": {
+            "description": "New email already in use"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/change-password": {
+      "patch": {
+        "summary": "Change user's password",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "oldPassword",
+                  "newPassword"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "oldPassword": {
+                    "type": "string",
+                    "format": "password"
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed successfully"
+          },
+          "400": {
+            "description": "Invalid input or old password incorrect"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/users/security-questions": {
+      "post": {
+        "summary": "Set or update user's security questions",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "userId",
+                  "questions"
+                ],
+                "properties": {
+                  "userId": {
+                    "type": "string"
+                  },
+                  "questions": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/SecurityQuestionInput"
+                    },
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Security questions set/updated successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher": {
+      "post": {
+        "summary": "Create a new voucher template",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoucherTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Voucher template created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoucherTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher/{id}": {
+      "put": {
+        "summary": "Update a voucher template by ID",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Voucher Template ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoucherTemplate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Voucher template updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoucherTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID format"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a voucher template by ID",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Voucher Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voucher template deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a voucher template by ID",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Voucher Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voucher template data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoucherTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher/brand/{id}": {
+      "get": {
+        "summary": "Get all voucher templates for a specific brand",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Brand ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of voucher templates for the brand",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VoucherTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Brand ID format"
+          },
+          "404": {
+            "description": "Brand not found or has no voucher templates"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher/nearby/single-branch": {
+      "get": {
+        "summary": "Get nearby voucher templates (for brands with only one branch)",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "required": true,
+            "description": "Latitude of the search center"
+          },
+          {
+            "in": "query",
+            "name": "long",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "required": true,
+            "description": "Longitude of the search center"
+          },
+          {
+            "in": "query",
+            "name": "distance",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "required": true,
+            "description": "Search radius in kilometers"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of nearby voucher templates from single-branch brands",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VoucherTemplate"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid query parameters (lat, long, distance)"
+          },
+          "500": {
+            "description": "Server error during search"
+          }
+        }
+      }
+    },
+    "/voucher-template": {
+      "post": {
+        "summary": "Create a new voucher template",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string"
+                  },
+                  "header": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Voucher template created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoucherTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a voucher template (requires ID in body)",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/VoucherTemplate"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "id"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Voucher template updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoucherTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or ID missing"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher-template/{id}": {
+      "get": {
+        "summary": "Get a voucher template by ID",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Voucher Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voucher template data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoucherTemplate"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a voucher template by ID",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Voucher Template ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Voucher template deleted successfully"
+          },
+          "400": {
+            "description": "Invalid ID format"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher-template/status": {
+      "patch": {
+        "summary": "Approve or reject a voucher template (requires ID in body)",
+        "tags": [
+          "VoucherTemplate"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "voucherTemplateId",
+                  "status"
+                ],
+                "properties": {
+                  "voucherTemplateId": {
+                    "type": "string",
+                    "description": "ID of the voucher template to update"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "approved",
+                      "rejected"
+                    ],
+                    "description": "The new status"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Voucher template status updated successfully"
+          },
+          "400": {
+            "description": "Invalid input (ID or status missing/invalid)"
+          },
+          "404": {
+            "description": "Voucher template not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/voucher-transaction/by-corporate": {
+      "post": {
+        "summary": "Get voucher transactions by Corporate ID",
+        "tags": [
+          "VoucherTransaction"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "corporateId"
+                ],
+                "properties": {
+                  "corporateId": {
+                    "type": "string",
+                    "description": "ID of the corporate entity to fetch transactions for."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of voucher transactions for the specified corporate ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VoucherTransaction"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input (e.g., missing corporateId)"
+          },
+          "404": {
+            "description": "Corporate ID not found or no transactions found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Branch",
+      "description": "Branch management, login, and approval"
+    },
+    {
+      "name": "Category",
+      "description": "Product category management"
+    },
+    {
+      "name": "Corporate",
+      "description": "Corporate entity management and login"
+    },
+    {
+      "name": "DealLevel",
+      "description": "Management of deal levels (e.g., tiers, types)"
+    },
+    {
+      "name": "DealTemplate",
+      "description": "Management of reusable deal templates"
+    },
+    {
+      "name": "Invoice",
+      "description": "Invoice verification and retrieval"
+    },
+    {
+      "name": "IssueVoucher",
+      "description": "Issuing vouchers to users"
+    },
+    {
+      "name": "Product",
+      "description": "Product management"
+    },
+    {
+      "name": "SubCategory",
+      "description": "Product sub-category management"
+    },
+    {
+      "name": "Users",
+      "description": "User management, authentication, and profile updates"
+    },
+    {
+      "name": "VoucherTemplate",
+      "description": "Management of voucher templates"
+    },
+    {
+      "name": "VoucherTransaction",
+      "description": "Retrieval of voucher transaction records"
+    }
+  ]
+}
