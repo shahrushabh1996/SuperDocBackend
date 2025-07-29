@@ -52,10 +52,14 @@ class UserController {
                 });
             }
             
-            const result = await userService.sendOTP(value.mobile);
+            // Check if this is for signup flow (optional parameter)
+            const isSignup = req.body.isSignup || false;
+            
+            const result = await userService.sendOTP(value.mobile, isSignup);
             
             return res.status(200).json({
-                message: result.message
+                message: result.message,
+                isNewUser: result.isNewUser || false
             });
             
         } catch (error) {

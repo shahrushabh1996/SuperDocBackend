@@ -74,8 +74,17 @@ class UserService {
         };
     }
     
-    async sendOTP(mobile) {
+    async sendOTP(mobile, isSignup = false) {
         const user = await UserDAO.findByMobile(mobile);
+        
+        // For signup flow, if user doesn't exist, just return success
+        // The actual OTP will be sent during the signup process
+        if (!user && isSignup) {
+            return { 
+                message: 'OTP will be sent during signup', 
+                isNewUser: true 
+            };
+        }
         
         if (!user) {
             throw new Error('User not found');

@@ -22,6 +22,10 @@ const { verifyUserToken } = require('../middleware/user.auth.middleware');
  *                 type: string
  *                 description: User's mobile number (10 digits)
  *                 example: "9999999999"
+ *               isSignup:
+ *                 type: boolean
+ *                 description: Set to true if checking for signup flow
+ *                 example: false
  *     responses:
  *       200:
  *         description: OTP sent successfully
