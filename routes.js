@@ -10,6 +10,7 @@ const documentRoutes = require('./document/document.route');
 const settingsRoutes = require('./settings/settings.route');
 const workflowRoutes = require('./workflow/workflow.route');
 const portalRoutes = require('./portal/portal.route');
+const adminRoutes = require('./admin/admin.route');
 
 
 
@@ -30,5 +31,8 @@ router.use('/workflows', workflowRoutes);
 
 // Portal routes
 router.use('/portals', portalRoutes);
+
+// Admin routes
+router.use('/admin', adminRoutes);
 
 module.exports = router;

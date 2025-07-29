@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const routes = require('./routes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+const https = require('https');
+const fs = require('fs');
 
 dotenv.config();
 
@@ -33,8 +35,14 @@ if (process.env.AWS_LAMBDA_FUNCTION_NAME === undefined) {
     app.use('/api', routes);
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-    app.listen(port, () => {
-        console.log(`Server is running on port ${port}`);
+    // HTTPS configuration
+    const httpsOptions = {
+        key: fs.readFileSync(process.env.SSL_KEY_PATH || '/home/ubuntu/ssl-certs/privkey.pem'),
+        cert: fs.readFileSync(process.env.SSL_CERT_PATH || '/home/ubuntu/ssl-certs/fullchain.pem')
+    };
+
+    https.createServer(httpsOptions, app).listen(port, () => {
+        console.log(`HTTPS Server is running on port ${port}`);
     });
 }
 
