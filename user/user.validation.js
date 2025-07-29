@@ -36,6 +36,9 @@ class UserValidation {
             mobile: Joi.string().pattern(/^[6-9]\d{9}$/).required().messages({
                 'string.pattern.base': 'Mobile number must be a valid 10-digit Indian mobile number starting with 6-9',
                 'string.empty': 'Mobile number is required'
+            }),
+            isSignup: Joi.boolean().optional().default(false).messages({
+                'boolean.base': 'isSignup must be a boolean value'
             })
         });
 
