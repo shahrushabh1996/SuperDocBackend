@@ -21,6 +21,10 @@ class UserValidation {
             }),
             email: Joi.string().email().optional().allow('').messages({
                 'string.email': 'Please provide a valid email address'
+            }),
+            otp: Joi.string().length(6).pattern(/^[0-9]+$/).optional().messages({
+                'string.length': 'OTP must be 6 digits',
+                'string.pattern.base': 'OTP must only contain numbers'
             })
         });
 
