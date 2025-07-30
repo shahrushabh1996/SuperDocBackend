@@ -16,16 +16,43 @@ class WorkflowValidation {
                 'string.pattern.base': 'Template ID must be a valid MongoDB ObjectId'
             }),
             settings: Joi.object({
-                allowMultipleSubmissions: Joi.boolean().optional(),
-                requireAuthentication: Joi.boolean().optional(),
-                sendEmailNotifications: Joi.boolean().optional(),
-                autoArchiveAfterDays: Joi.number().integer().min(1).optional().allow(null),
-                emailSubject: Joi.string().optional(),
-                emailBody: Joi.string().optional(),
-                daysBeforeActivation: Joi.number().integer().min(0).optional(),
-                sendFrequency: Joi.string().valid('daily', 'weekly', 'monthly').optional(),
-                maxAttempts: Joi.number().integer().min(1).optional()
-            }).optional()
+                allowMultipleSubmissions: Joi.boolean().optional().messages({
+                    'boolean.base': 'Allow multiple submissions must be either true or false'
+                }),
+                requireAuthentication: Joi.boolean().optional().messages({
+                    'boolean.base': 'Require authentication must be either true or false'
+                }),
+                sendEmailNotifications: Joi.boolean().optional().messages({
+                    'boolean.base': 'Send email notifications must be either true or false'
+                }),
+                autoArchiveAfterDays: Joi.number().integer().min(1).optional().allow(null).messages({
+                    'number.base': 'Auto archive days must be a number',
+                    'number.integer': 'Auto archive days must be a whole number',
+                    'number.min': 'Auto archive days must be at least 1 day'
+                }),
+                emailSubject: Joi.string().optional().messages({
+                    'string.base': 'Email subject must be text'
+                }),
+                emailBody: Joi.string().optional().messages({
+                    'string.base': 'Email body must be text'
+                }),
+                daysBeforeActivation: Joi.number().integer().min(0).optional().messages({
+                    'number.base': 'Days before activation must be a number',
+                    'number.integer': 'Days before activation must be a whole number',
+                    'number.min': 'Days before activation cannot be negative'
+                }),
+                sendFrequency: Joi.string().valid('daily', 'weekly', 'monthly').optional().messages({
+                    'any.only': 'Send frequency must be one of: daily, weekly, or monthly',
+                    'string.base': 'Send frequency must be text'
+                }),
+                maxAttempts: Joi.number().integer().min(1).optional().messages({
+                    'number.base': 'Maximum attempts must be a number',
+                    'number.integer': 'Maximum attempts must be a whole number',
+                    'number.min': 'Maximum attempts must be at least 1'
+                })
+            }).optional().messages({
+                'object.unknown': 'Unknown setting field: {#label}'
+            })
         });
 
         return schema.validate(data);
@@ -112,36 +139,78 @@ class WorkflowValidation {
                 })
             ).optional(),
             settings: Joi.object({
-                allowMultipleSubmissions: Joi.boolean().optional(),
-                requireAuthentication: Joi.boolean().optional(),
-                sendEmailNotifications: Joi.boolean().optional(),
-                autoArchiveAfterDays: Joi.number().integer().min(1).optional().allow(null),
+                allowMultipleSubmissions: Joi.boolean().optional().messages({
+                    'boolean.base': 'Allow multiple submissions must be either true or false'
+                }),
+                requireAuthentication: Joi.boolean().optional().messages({
+                    'boolean.base': 'Require authentication must be either true or false'
+                }),
+                sendEmailNotifications: Joi.boolean().optional().messages({
+                    'boolean.base': 'Send email notifications must be either true or false'
+                }),
+                autoArchiveAfterDays: Joi.number().integer().min(1).optional().allow(null).messages({
+                    'number.base': 'Auto archive days must be a number',
+                    'number.integer': 'Auto archive days must be a whole number',
+                    'number.min': 'Auto archive days must be at least 1 day'
+                }),
                 emailSubject: Joi.string().when('sendEmailNotifications', {
                     is: true,
-                    then: Joi.string().optional(),
-                    otherwise: Joi.string().optional().allow('')
+                    then: Joi.string().optional().messages({
+                        'string.base': 'Email subject must be text'
+                    }),
+                    otherwise: Joi.string().optional().allow('').messages({
+                        'string.base': 'Email subject must be text'
+                    })
                 }),
                 emailBody: Joi.string().when('sendEmailNotifications', {
                     is: true,
-                    then: Joi.string().optional(),
-                    otherwise: Joi.string().optional().allow('')
+                    then: Joi.string().optional().messages({
+                        'string.base': 'Email body must be text'
+                    }),
+                    otherwise: Joi.string().optional().allow('').messages({
+                        'string.base': 'Email body must be text'
+                    })
                 }),
                 daysBeforeActivation: Joi.number().integer().min(0).when('sendEmailNotifications', {
                     is: true,
-                    then: Joi.number().integer().min(0).optional(),
-                    otherwise: Joi.number().integer().min(0).optional().allow(0)
+                    then: Joi.number().integer().min(0).optional().messages({
+                        'number.base': 'Days before activation must be a number',
+                        'number.integer': 'Days before activation must be a whole number',
+                        'number.min': 'Days before activation cannot be negative'
+                    }),
+                    otherwise: Joi.number().integer().min(0).optional().allow(0).messages({
+                        'number.base': 'Days before activation must be a number',
+                        'number.integer': 'Days before activation must be a whole number',
+                        'number.min': 'Days before activation cannot be negative'
+                    })
                 }),
                 sendFrequency: Joi.string().valid('daily', 'weekly', 'monthly').when('sendEmailNotifications', {
                     is: true,
-                    then: Joi.string().valid('daily', 'weekly', 'monthly').optional(),
-                    otherwise: Joi.string().valid('daily', 'weekly', 'monthly').optional().allow('')
+                    then: Joi.string().valid('daily', 'weekly', 'monthly').optional().messages({
+                        'any.only': 'Send frequency must be one of: daily, weekly, or monthly',
+                        'string.base': 'Send frequency must be text'
+                    }),
+                    otherwise: Joi.string().valid('daily', 'weekly', 'monthly').optional().allow('').messages({
+                        'any.only': 'Send frequency must be one of: daily, weekly, or monthly',
+                        'string.base': 'Send frequency must be text'
+                    })
                 }),
                 maxAttempts: Joi.number().integer().min(1).when('sendEmailNotifications', {
                     is: true,
-                    then: Joi.number().integer().min(1).optional(),
-                    otherwise: Joi.number().integer().min(0).optional().allow(0)
+                    then: Joi.number().integer().min(1).optional().messages({
+                        'number.base': 'Maximum attempts must be a number',
+                        'number.integer': 'Maximum attempts must be a whole number',
+                        'number.min': 'Maximum attempts must be at least 1'
+                    }),
+                    otherwise: Joi.number().integer().min(0).optional().allow(0).messages({
+                        'number.base': 'Maximum attempts must be a number',
+                        'number.integer': 'Maximum attempts must be a whole number',
+                        'number.min': 'Maximum attempts cannot be negative'
+                    })
                 })
-            }).optional(),
+            }).optional().messages({
+                'object.unknown': 'Unknown setting field: {#label}'
+            }),
             version: Joi.number().optional()
         });
 

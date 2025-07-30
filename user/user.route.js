@@ -118,6 +118,10 @@ const { verifyUserToken } = require('../middleware/user.auth.middleware');
  *                 organizationId:
  *                   type: string
  *                   example: "60d5ecb74f5b2f001c8e4b4b"
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for authentication
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *       400:
  *         description: Validation error
  *         content:

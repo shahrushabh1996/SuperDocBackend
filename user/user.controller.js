@@ -18,10 +18,22 @@ class UserController {
             
             const result = await userService.signup(value);
             
+            // Generate JWT token after successful signup
+            const token = jwt.sign(
+                { 
+                    userId: result.userId, 
+                    mobile: value.mobile,
+                    organizationId: result.organizationId 
+                },
+                process.env.JWT_SECRET || 'your-secret-key',
+                { expiresIn: '24h' }
+            );
+            
             return res.status(201).json({
                 message: result.message,
                 userId: result.userId,
-                organizationId: result.organizationId
+                organizationId: result.organizationId,
+                token: token
             });
             
         } catch (error) {
