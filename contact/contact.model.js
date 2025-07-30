@@ -109,6 +109,12 @@ const contactSchema = new mongoose.Schema({
     }
 });
 
+// Add compound unique index for email within an organization
+contactSchema.index({ email: 1, organizationId: 1 }, { 
+    unique: true,
+    partialFilterExpression: { status: { $ne: 'DELETED' } }
+});
+
 const Contact = mongoose.model('Contact', contactSchema);
 
 module.exports = Contact;

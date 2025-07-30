@@ -289,6 +289,7 @@ class ContactController {
             const results = [];
             const errors = [];
             let rowIndex = 0;
+            const emailsInFile = new Set(); // Track emails already seen in the CSV
 
             return new Promise((resolve, reject) => {
                 const stream = fs.createReadStream(req.file.path)
@@ -340,6 +341,18 @@ class ContactController {
                                 row: rowIndex,
                                 reason: validationError.message
                             });
+                        } else if (contactData.email) {
+                            // Check if email already exists in the CSV file
+                            const emailLower = contactData.email.toLowerCase();
+                            if (emailsInFile.has(emailLower)) {
+                                errors.push({
+                                    row: rowIndex,
+                                    reason: `Duplicate email ${contactData.email} found in CSV file`
+                                });
+                            } else {
+                                emailsInFile.add(emailLower);
+                                results.push(contactData);
+                            }
                         } else {
                             results.push(contactData);
                         }
@@ -350,21 +363,54 @@ class ContactController {
                             const insertErrors = [];
 
                             if (results.length > 0) {
-                                try {
-                                    const insertResult = await Contact.insertMany(results, { ordered: false });
-                                    insertedCount = insertResult.length;
-                                } catch (insertError) {
-                                    if (insertError.writeErrors) {
-                                        insertedCount = insertError.result.insertedIds ? Object.keys(insertError.result.insertedIds).length : 0;
-                                        insertError.writeErrors.forEach(writeError => {
-                                            const errorRow = results.findIndex(r => r._id === writeError.err.op._id) + 1;
-                                            insertErrors.push({
-                                                row: errorRow,
-                                                reason: writeError.err.errmsg || writeError.err.message
-                                            });
+                                // Extract all emails from results to check for duplicates
+                                const emails = results.map(r => r.email).filter(email => email);
+                                
+                                // Find existing contacts with these emails in the organization
+                                const existingContacts = await Contact.find({
+                                    organizationId: organizationId,
+                                    email: { $in: emails },
+                                    status: { $ne: 'DELETED' }
+                                }).select('email').lean();
+                                
+                                const existingEmails = new Set(existingContacts.map(c => c.email.toLowerCase()));
+                                
+                                // Separate contacts into new and duplicate
+                                const newContacts = [];
+                                const duplicateErrors = [];
+                                
+                                results.forEach((contact, index) => {
+                                    if (contact.email && existingEmails.has(contact.email.toLowerCase())) {
+                                        duplicateErrors.push({
+                                            row: index + 1,
+                                            reason: `Contact with email ${contact.email} already exists in your organization`
                                         });
+                                    } else {
+                                        newContacts.push(contact);
+                                    }
+                                });
+                                
+                                // Insert only new contacts
+                                if (newContacts.length > 0) {
+                                    try {
+                                        const insertResult = await Contact.insertMany(newContacts, { ordered: false });
+                                        insertedCount = insertResult.length;
+                                    } catch (insertError) {
+                                        if (insertError.writeErrors) {
+                                            insertedCount = insertError.result.insertedIds ? Object.keys(insertError.result.insertedIds).length : 0;
+                                            insertError.writeErrors.forEach(writeError => {
+                                                const errorRow = newContacts.findIndex(r => r._id === writeError.err.op._id) + 1;
+                                                insertErrors.push({
+                                                    row: errorRow,
+                                                    reason: writeError.err.errmsg || writeError.err.message
+                                                });
+                                            });
+                                        }
                                     }
                                 }
+                                
+                                // Add duplicate errors to the insertErrors array
+                                insertErrors.push(...duplicateErrors);
                             }
 
                             fs.unlinkSync(req.file.path);
