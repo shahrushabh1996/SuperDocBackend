@@ -1211,7 +1211,7 @@ class WorkflowService {
             const workflow = await Workflow.findOne({
                 _id: workflowId,
                 organizationId,
-                isDeleted: false
+                deletedAt: { $exists: false }
             });
 
             if (!workflow) {
