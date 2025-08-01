@@ -115,7 +115,7 @@ class WorkflowValidation {
                         }),
                         otherwise: Joi.optional()
                     }),
-                    type: Joi.string().valid('form', 'document', 'documents', 'screen', 'approval', 'email', 'sms', 'webhook', 'condition', 'delay').when('action', {
+                    type: Joi.string().valid('Form', 'Document', 'Documents', 'Screen', 'Approval', 'Email', 'Sms', 'Webhook', 'Condition', 'Delay').when('action', {
                         is: 'create',
                         then: Joi.required().messages({
                             'any.required': 'Type is required for create action'
@@ -322,13 +322,13 @@ class WorkflowValidation {
                 'string.min': 'Step name must be at least 1 character',
                 'string.max': 'Step name cannot exceed 200 characters'
             }),
-            type: Joi.string().valid('form', 'document', 'documents', 'screen', 'approval', 'email', 'sms', 'webhook', 'condition', 'delay').optional().messages({
-                'any.only': 'Type must be one of: form, document, documents, screen, approval, email, sms, webhook, condition, delay'
+            type: Joi.string().valid('Form', 'Document', 'Documents', 'Screen', 'Approval', 'Email', 'Sms', 'Webhook', 'Condition', 'Delay').optional().messages({
+                'any.only': 'Type must be one of: Form, Document, Documents, Screen, Approval, Email, Sms, Webhook, Condition, Delay'
             }),
             config: Joi.object({
                 // Screen-specific fields
                 screenTitle: Joi.when('...type', {
-                    is: 'screen',
+                    is: 'Screen',
                     then: Joi.string().trim().min(1).max(500).optional().messages({
                         'string.empty': 'Screen title cannot be empty',
                         'string.min': 'Screen title must be at least 1 character',
@@ -337,7 +337,7 @@ class WorkflowValidation {
                     otherwise: Joi.forbidden()
                 }),
                 screenContent: Joi.when('...type', {
-                    is: 'screen',
+                    is: 'Screen',
                     then: Joi.string().max(50000).optional().messages({
                         'string.empty': 'Screen content cannot be empty',
                         'string.max': 'Screen content cannot exceed 50000 characters'
