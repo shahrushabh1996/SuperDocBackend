@@ -792,10 +792,12 @@ class WorkflowService {
             }
             if (stepData.config !== undefined) {
                 // If this is a screen type step, sanitize the HTML content
-                if (stepData.type === 'screen' || updatedStep.type === 'screen') {
-                    if (stepData.config.content) {
+                const isScreenType = (stepData.type && stepData.type.toLowerCase() === 'screen') || 
+                                   (updatedStep.type && updatedStep.type.toLowerCase() === 'screen');
+                if (isScreenType) {
+                    if (stepData.config.screenContent) {
                         // Sanitize HTML content before saving
-                        stepData.config.content = sanitizer.sanitizeScreenContent(stepData.config.content);
+                        stepData.config.screenContent = sanitizer.sanitizeScreenContent(stepData.config.screenContent);
                     }
                 }
                 updatedStep.config = { ...updatedStep.config, ...stepData.config };
@@ -852,7 +854,14 @@ class WorkflowService {
             }
 
             // Find and return the updated step
+            console.log('Looking for step with id:', stepId);
+            console.log('Available steps:', updatedWorkflow.steps.map(s => ({ id: s.id, _id: s._id })));
+            
             const finalUpdatedStep = updatedWorkflow.steps.find(step => step.id === stepId);
+            
+            if (!finalUpdatedStep) {
+                throw new Error(`Updated step not found with id: ${stepId}`);
+            }
             
             return finalUpdatedStep;
         } catch (error) {
