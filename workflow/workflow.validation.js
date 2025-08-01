@@ -327,24 +327,22 @@ class WorkflowValidation {
             }),
             config: Joi.object({
                 // Screen-specific fields
-                title: Joi.when('$type', {
+                screenTitle: Joi.when('...type', {
                     is: 'screen',
-                    then: Joi.string().trim().min(1).max(500).required().messages({
-                        'string.empty': 'Screen title is required',
+                    then: Joi.string().trim().min(1).max(500).optional().messages({
+                        'string.empty': 'Screen title cannot be empty',
                         'string.min': 'Screen title must be at least 1 character',
-                        'string.max': 'Screen title cannot exceed 500 characters',
-                        'any.required': 'Screen title is required for screen type steps'
+                        'string.max': 'Screen title cannot exceed 500 characters'
                     }),
-                    otherwise: Joi.string().optional()
+                    otherwise: Joi.forbidden()
                 }),
-                content: Joi.when('$type', {
+                screenContent: Joi.when('...type', {
                     is: 'screen',
-                    then: Joi.string().max(50000).required().messages({
-                        'string.empty': 'Screen content is required',
-                        'string.max': 'Screen content cannot exceed 50000 characters',
-                        'any.required': 'Screen content is required for screen type steps'
+                    then: Joi.string().max(50000).optional().messages({
+                        'string.empty': 'Screen content cannot be empty',
+                        'string.max': 'Screen content cannot exceed 50000 characters'
                     }),
-                    otherwise: Joi.string().optional()
+                    otherwise: Joi.forbidden()
                 }),
                 // Form fields
                 fields: Joi.array().items(
@@ -384,9 +382,9 @@ class WorkflowValidation {
                     condition: Joi.object().optional()
                 })
             ).optional()
-        }).prefs({ context: true }); // Enable context to access parent fields
+        });
 
-        return schema.validate(data, { context: { type: data.type } });
+        return schema.validate(data);
     }
 
     async validateWorkflowStepIds(params) {
