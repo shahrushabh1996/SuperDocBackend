@@ -326,6 +326,27 @@ class WorkflowValidation {
                 'any.only': 'Type must be one of: form, document, documents, screen, approval, email, sms, webhook, condition, delay'
             }),
             config: Joi.object({
+                // Screen-specific fields
+                title: Joi.when('$type', {
+                    is: 'screen',
+                    then: Joi.string().trim().min(1).max(500).required().messages({
+                        'string.empty': 'Screen title is required',
+                        'string.min': 'Screen title must be at least 1 character',
+                        'string.max': 'Screen title cannot exceed 500 characters',
+                        'any.required': 'Screen title is required for screen type steps'
+                    }),
+                    otherwise: Joi.string().optional()
+                }),
+                content: Joi.when('$type', {
+                    is: 'screen',
+                    then: Joi.string().max(50000).required().messages({
+                        'string.empty': 'Screen content is required',
+                        'string.max': 'Screen content cannot exceed 50000 characters',
+                        'any.required': 'Screen content is required for screen type steps'
+                    }),
+                    otherwise: Joi.string().optional()
+                }),
+                // Form fields
                 fields: Joi.array().items(
                     Joi.object({
                         id: Joi.string().optional(),
@@ -363,9 +384,9 @@ class WorkflowValidation {
                     condition: Joi.object().optional()
                 })
             ).optional()
-        });
+        }).prefs({ context: true }); // Enable context to access parent fields
 
-        return schema.validate(data);
+        return schema.validate(data, { context: { type: data.type } });
     }
 
     async validateWorkflowStepIds(params) {

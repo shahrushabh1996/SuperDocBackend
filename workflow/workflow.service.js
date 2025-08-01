@@ -3,6 +3,7 @@ const Workflow = require('./workflow.model');
 const WorkflowExecution = require('../workflowExecution/workflowExecution.model');
 const { v4: uuidv4 } = require('uuid');
 const utils = require('../common/utils');
+const sanitizer = require('../utils/sanitizer');
 
 class WorkflowService {
     
@@ -790,6 +791,13 @@ class WorkflowService {
                 updatedStep.type = stepData.type;
             }
             if (stepData.config !== undefined) {
+                // If this is a screen type step, sanitize the HTML content
+                if (stepData.type === 'screen' || updatedStep.type === 'screen') {
+                    if (stepData.config.content) {
+                        // Sanitize HTML content before saving
+                        stepData.config.content = sanitizer.sanitizeScreenContent(stepData.config.content);
+                    }
+                }
                 updatedStep.config = { ...updatedStep.config, ...stepData.config };
             }
             if (stepData.nextSteps !== undefined) {
