@@ -176,13 +176,23 @@ class Utils {
 
     // Generate signed URL for S3 download
     generateSignedDownloadUrl(bucketName, key, expiresInSeconds = 300) {
+        // Create a new S3 instance with explicit regional endpoint configuration
+        const regionalS3 = new AWS.S3({
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            region: process.env.AWS_REGION || 'ap-south-1',
+            endpoint: `https://s3.${process.env.AWS_REGION || 'ap-south-1'}.amazonaws.com`,
+            s3ForcePathStyle: false,
+            signatureVersion: 'v4'
+        });
+
         const params = {
             Bucket: bucketName,
             Key: key,
             Expires: expiresInSeconds, // 5 minutes default
         };
         
-        return s3.getSignedUrl('getObject', params);
+        return regionalS3.getSignedUrl('getObject', params);
     }
 
     // Generate organization slug from name
@@ -388,23 +398,38 @@ For each extracted field (invoiceNumber, date, vendorName, items, subtotal, tax,
                       `ContentType: ${contentType}`,
                       `Expires: ${expires}`);
         
-        // Log the Access Key ID the SDK is configured with
-        // Note: Ensure this logging is appropriate for your environment's security policy.
-        // Avoid logging Secret Access Keys.
+        // Log the Access Key ID and region the SDK is configured with
         let configuredAccessKeyId = 'N/A';
-        if (s3 && s3.config && s3.config.credentials && s3.config.credentials.accessKeyId) {
-            configuredAccessKeyId = s3.config.credentials.accessKeyId;
+        let configuredRegion = 'N/A';
+        if (s3 && s3.config) {
+            if (s3.config.credentials && s3.config.credentials.accessKeyId) {
+                configuredAccessKeyId = s3.config.credentials.accessKeyId;
+            }
+            if (s3.config.region) {
+                configuredRegion = s3.config.region;
+            }
         }
         console.log(`  Using AWS Access Key ID (from SDK config): ${configuredAccessKeyId}`);
+        console.log(`  Using AWS Region (from SDK config): ${configuredRegion}`);
 
         try {
+            // Create a new S3 instance with explicit regional endpoint configuration
+            const regionalS3 = new AWS.S3({
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+                region: process.env.AWS_REGION || 'ap-south-1',
+                endpoint: `https://s3.${process.env.AWS_REGION || 'ap-south-1'}.amazonaws.com`,
+                s3ForcePathStyle: false,
+                signatureVersion: 'v4'
+            });
+
             const params = {
                 Bucket: bucketName.toLowerCase(),
                 Key: key,
                 Expires: expires,
                 ContentType: contentType
             };
-            const url = await s3.getSignedUrlPromise('putObject', params);
+            const url = await regionalS3.getSignedUrlPromise('putObject', params);
             console.log('[Utils.generatePresignedUrl] Successfully generated presigned URL:', url);
             return url;
         } catch (error) {
