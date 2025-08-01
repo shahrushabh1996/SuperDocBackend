@@ -2,6 +2,7 @@ const WorkflowDAO = require('./workflow.dao');
 const Workflow = require('./workflow.model');
 const WorkflowExecution = require('../workflowExecution/workflowExecution.model');
 const { v4: uuidv4 } = require('uuid');
+const utils = require('../common/utils');
 
 class WorkflowService {
     
@@ -1193,6 +1194,83 @@ class WorkflowService {
 
         } catch (error) {
             throw new Error(`Failed to reorder workflow steps: ${error.message}`);
+        }
+    }
+
+    async generatePresignedUrl(workflowId, fileName, contentType, stepId, expires, userId, organizationId) {
+        try {
+            // 1. Verify workflow exists and user has access
+            const workflow = await Workflow.findOne({
+                _id: workflowId,
+                organizationId,
+                isDeleted: false
+            });
+
+            if (!workflow) {
+                throw new Error('Workflow not found');
+            }
+
+            // 2. If stepId provided, verify it exists in workflow
+            if (stepId && workflow.steps) {
+                const stepExists = workflow.steps.some(step => step.id === stepId);
+                if (!stepExists) {
+                    throw new Error('Step not found in workflow');
+                }
+            }
+
+            // 3. Generate unique S3 key
+            const timestamp = Date.now();
+            const randomString = utils.generateID(8);
+            const fileExtension = fileName.includes('.') ? fileName.substring(fileName.lastIndexOf('.')) : '';
+            const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+            
+            // Structure: workflows/{organizationId}/{workflowId}/{stepId?}/{timestamp}-{random}-{filename}
+            let key = `workflows/${organizationId}/${workflowId}/`;
+            if (stepId) {
+                key += `${stepId}/`;
+            }
+            key += `${timestamp}-${randomString}-${sanitizedFileName}`;
+
+            // 4. Get bucket name from environment
+            const bucketName = process.env.AWS_WORKFLOW_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME;
+            
+            if (!bucketName) {
+                throw new Error('S3 bucket configuration missing');
+            }
+
+            // 5. Generate presigned URL
+            const presignedUrl = await utils.generatePresignedUrl(
+                bucketName,
+                key,
+                contentType,
+                expires
+            );
+
+            // 6. Calculate expiration timestamp
+            const expiresAt = new Date(Date.now() + (expires * 1000));
+
+            // 7. Log the file upload request for tracking (optional)
+            console.log(`[WorkflowService] Generated presigned URL for workflow ${workflowId}:`, {
+                userId,
+                organizationId,
+                workflowId,
+                stepId,
+                fileName,
+                contentType,
+                key,
+                expiresAt
+            });
+
+            // 8. Return the presigned URL details
+            return {
+                uploadUrl: presignedUrl,
+                key,
+                expiresAt: expiresAt.toISOString()
+            };
+
+        } catch (error) {
+            console.error('[WorkflowService] Error generating presigned URL:', error);
+            throw error;
         }
     }
 }

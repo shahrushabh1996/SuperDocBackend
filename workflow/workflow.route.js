@@ -1330,4 +1330,150 @@ router.get('/:id/analytics', verifyUserToken, workflowController.getWorkflowAnal
  */
 router.post('/:id/reorder-steps', verifyUserToken, workflowController.reorderSteps);
 
+/**
+ * @swagger
+ * /workflows/{id}/presigned-url:
+ *   post:
+ *     summary: Generate presigned URL for workflow file upload
+ *     tags: [Workflows]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *         description: Workflow ID
+ *         example: "507f1f77bcf86cd799439011"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fileName
+ *               - contentType
+ *             properties:
+ *               fileName:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
+ *                 description: Name of the file to upload
+ *                 example: "workflow-document.pdf"
+ *               contentType:
+ *                 type: string
+ *                 description: MIME type of the file
+ *                 example: "application/pdf"
+ *                 enum:
+ *                   - application/pdf
+ *                   - image/jpeg
+ *                   - image/png
+ *                   - image/gif
+ *                   - application/msword
+ *                   - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+ *                   - application/vnd.ms-excel
+ *                   - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+ *               stepId:
+ *                 type: string
+ *                 description: Optional step ID to associate the file with
+ *                 example: "step-123"
+ *               expires:
+ *                 type: integer
+ *                 minimum: 60
+ *                 maximum: 3600
+ *                 default: 900
+ *                 description: URL expiration time in seconds (default 15 minutes)
+ *                 example: 900
+ *     responses:
+ *       200:
+ *         description: Presigned URL generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     uploadUrl:
+ *                       type: string
+ *                       format: uri
+ *                       description: Presigned URL for file upload
+ *                       example: "https://s3.amazonaws.com/bucket/key?X-Amz-Algorithm=..."
+ *                     key:
+ *                       type: string
+ *                       description: S3 object key for the file
+ *                       example: "workflows/507f1f77bcf86cd799439011/1234567890-workflow-document.pdf"
+ *                     expiresAt:
+ *                       type: string
+ *                       format: date-time
+ *                       description: Timestamp when the URL expires
+ *                       example: "2025-08-01T12:30:00Z"
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   examples:
+ *                     invalidWorkflowId:
+ *                       value: "Workflow ID must be a valid MongoDB ObjectId"
+ *                     missingFileName:
+ *                       value: "File name is required"
+ *                     invalidContentType:
+ *                       value: "Invalid content type"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Access token is required"
+ *       404:
+ *         description: Workflow not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Workflow not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.post('/:id/presigned-url', verifyUserToken, workflowController.generatePresignedUrl);
+
 module.exports = router;

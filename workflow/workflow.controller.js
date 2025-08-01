@@ -636,6 +636,60 @@ class WorkflowController {
             });
         }
     }
+
+    async generatePresignedUrl(req, res) {
+        try {
+            // Combine params and body for validation
+            const requestData = {
+                id: req.params.id,
+                fileName: req.body.fileName,
+                contentType: req.body.contentType,
+                stepId: req.body.stepId,
+                expires: req.body.expires
+            };
+
+            // Validate request
+            const { error, value } = await workflowValidation.generatePresignedUrl(requestData);
+            if (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: error.details[0].message
+                });
+            }
+
+            const userId = req.user.userId;
+            const organizationId = req.user.organizationId;
+
+            // Generate presigned URL through service
+            const result = await workflowService.generatePresignedUrl(
+                value.id,
+                value.fileName,
+                value.contentType,
+                value.stepId,
+                value.expires,
+                userId,
+                organizationId
+            );
+
+            return res.status(200).json({
+                success: true,
+                data: result
+            });
+
+        } catch (error) {
+            console.error('Error generating presigned URL:', error);
+            if (error.message === 'Workflow not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+    }
 }
 
 module.exports = new WorkflowController();

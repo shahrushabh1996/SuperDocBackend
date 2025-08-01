@@ -421,6 +421,43 @@ class WorkflowValidation {
         });
         return schema.validate(data);
     }
+
+    async generatePresignedUrl(data) {
+        const schema = Joi.object({
+            id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required().messages({
+                'string.pattern.base': 'Workflow ID must be a valid MongoDB ObjectId'
+            }),
+            fileName: Joi.string().trim().min(1).max(255).required().messages({
+                'string.empty': 'File name is required',
+                'string.min': 'File name must be at least 1 character',
+                'string.max': 'File name cannot exceed 255 characters',
+                'any.required': 'File name is required'
+            }),
+            contentType: Joi.string().valid(
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            ).required().messages({
+                'any.only': 'Invalid content type',
+                'any.required': 'Content type is required'
+            }),
+            stepId: Joi.string().optional().allow('').messages({
+                'string.base': 'Step ID must be a string'
+            }),
+            expires: Joi.number().integer().min(60).max(3600).optional().default(900).messages({
+                'number.base': 'Expires must be a number',
+                'number.integer': 'Expires must be an integer',
+                'number.min': 'Expires must be at least 60 seconds',
+                'number.max': 'Expires cannot exceed 3600 seconds'
+            })
+        });
+        return schema.validate(data);
+    }
 }
 
 module.exports = new WorkflowValidation();
