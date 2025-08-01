@@ -55,7 +55,7 @@ const workflowSchema = new mongoose.Schema({
         },
         type: {
             type: String,
-            enum: ['Form', 'Document', 'Documents', 'Screen', 'Approval', 'Email', 'Sms', 'Webhook', 'Condition', 'Delay'],
+            enum: ['form', 'document', 'documents', 'screen', 'approval', 'email', 'sms', 'webhook', 'condition', 'delay', 'Form', 'Document', 'Documents', 'Screen', 'Approval', 'Email', 'Sms', 'Webhook', 'Condition', 'Delay'],
             required: true
         },
         order: {
