@@ -1109,6 +1109,92 @@ class WorkflowService {
             throw new Error(`Failed to retrieve workflow analytics: ${error.message}`);
         }
     }
+
+    async reorderWorkflowSteps(workflowId, reorderInstructions, userId, organizationId) {
+        try {
+            // 1. Fetch the workflow
+            const workflow = await Workflow.findOne({
+                _id: workflowId,
+                organizationId,
+                deletedAt: { $exists: false }
+            });
+
+            if (!workflow) {
+                throw new Error('Workflow not found');
+            }
+
+            // 2. Validate all step IDs exist
+            const existingStepIds = workflow.steps.map(step => step.id);
+            const instructionStepIds = reorderInstructions.map(instruction => instruction.stepId);
+            
+            for (const instruction of reorderInstructions) {
+                if (!existingStepIds.includes(instruction.stepId)) {
+                    throw new Error(`Step with ID '${instruction.stepId}' not found in workflow`);
+                }
+            }
+
+            // 3. Check for duplicate positions
+            const positions = reorderInstructions.map(instruction => instruction.newPosition);
+            const uniquePositions = new Set(positions);
+            if (positions.length !== uniquePositions.size) {
+                throw new Error('Multiple steps cannot have the same position');
+            }
+
+            // 4. Validate position range
+            const maxPosition = workflow.steps.length;
+            for (const instruction of reorderInstructions) {
+                if (instruction.newPosition < 1 || instruction.newPosition > maxPosition) {
+                    throw new Error(`Position must be between 1 and ${maxPosition}`);
+                }
+            }
+
+            // 5. Create a mapping of stepId to newPosition
+            const positionMap = new Map();
+            reorderInstructions.forEach(instruction => {
+                positionMap.set(instruction.stepId, instruction.newPosition);
+            });
+
+            // 6. Clone and reorder steps
+            const reorderedSteps = [...workflow.steps];
+            
+            // Sort steps based on new positions
+            reorderedSteps.sort((a, b) => {
+                const posA = positionMap.has(a.id) ? positionMap.get(a.id) : a.order || 999;
+                const posB = positionMap.has(b.id) ? positionMap.get(b.id) : b.order || 999;
+                
+                if (posA === posB) {
+                    // If same position (shouldn't happen with validation), maintain original order
+                    return (a.order || 0) - (b.order || 0);
+                }
+                return posA - posB;
+            });
+
+            // 7. Update order field for all steps
+            reorderedSteps.forEach((step, index) => {
+                step.order = index + 1;
+            });
+
+            // 8. Update the workflow with reordered steps
+            workflow.steps = reorderedSteps;
+            workflow.updatedBy = userId;
+            workflow.markModified('steps');
+            
+            await workflow.save();
+
+            // 9. Return formatted response
+            return {
+                workflowId: workflow._id.toString(),
+                steps: reorderedSteps.map(step => ({
+                    id: step.id,
+                    title: step.name || step.title,
+                    order: step.order
+                }))
+            };
+
+        } catch (error) {
+            throw new Error(`Failed to reorder workflow steps: ${error.message}`);
+        }
+    }
 }
 
 module.exports = new WorkflowService();

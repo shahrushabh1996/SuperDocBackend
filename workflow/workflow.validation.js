@@ -395,6 +395,32 @@ class WorkflowValidation {
         });
         return schema.validate(data);
     }
+
+    async reorderSteps(data) {
+        const schema = Joi.object({
+            id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required().messages({
+                'string.pattern.base': 'Workflow ID must be a valid MongoDB ObjectId'
+            }),
+            steps: Joi.array().min(1).required().items(
+                Joi.object({
+                    stepId: Joi.string().required().messages({
+                        'string.empty': 'Step ID is required',
+                        'any.required': 'Step ID is required'
+                    }),
+                    newPosition: Joi.number().integer().min(1).required().messages({
+                        'number.base': 'New position must be a number',
+                        'number.integer': 'New position must be an integer',
+                        'number.min': 'New position must be at least 1',
+                        'any.required': 'New position is required'
+                    })
+                })
+            ).messages({
+                'array.min': 'At least one step reordering instruction is required',
+                'any.required': 'Steps array is required'
+            })
+        });
+        return schema.validate(data);
+    }
 }
 
 module.exports = new WorkflowValidation();

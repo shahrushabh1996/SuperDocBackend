@@ -579,6 +579,63 @@ class WorkflowController {
             });
         }
     }
+
+    async reorderSteps(req, res) {
+        try {
+            const requestData = {
+                id: req.params.id,
+                steps: req.body.steps
+            };
+
+            const { error, value } = await workflowValidation.reorderSteps(requestData);
+            if (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: error.details[0].message
+                });
+            }
+
+            const userId = req.user.userId;
+            const organizationId = req.user.organizationId;
+
+            const result = await workflowService.reorderWorkflowSteps(
+                value.id,
+                value.steps,
+                userId,
+                organizationId
+            );
+
+            return res.status(200).json({
+                success: true,
+                message: 'Steps reordered successfully',
+                data: {
+                    workflowId: result.workflowId,
+                    steps: result.steps
+                }
+            });
+
+        } catch (error) {
+            console.error('Error reordering workflow steps:', error);
+            if (error.message === 'Workflow not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            if (error.message.includes('not found in workflow') || 
+                error.message.includes('Multiple steps cannot have the same position') ||
+                error.message.includes('Position must be between')) {
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+    }
 }
 
 module.exports = new WorkflowController();

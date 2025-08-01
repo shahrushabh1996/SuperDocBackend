@@ -1182,4 +1182,152 @@ router.delete('/:id/steps/:stepId', verifyUserToken, workflowController.deleteWo
  */
 router.get('/:id/analytics', verifyUserToken, workflowController.getWorkflowAnalytics);
 
+/**
+ * @swagger
+ * /workflows/{id}/reorder-steps:
+ *   post:
+ *     summary: Reorder workflow steps
+ *     tags: [Workflows]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: "^[0-9a-fA-F]{24}$"
+ *         description: Workflow ID
+ *         example: "507f1f77bcf86cd799439011"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - steps
+ *             properties:
+ *               steps:
+ *                 type: array
+ *                 minItems: 1
+ *                 description: Array of step reordering instructions
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - stepId
+ *                     - newPosition
+ *                   properties:
+ *                     stepId:
+ *                       type: string
+ *                       description: The ID of the step to reorder
+ *                       example: "step-123"
+ *                     newPosition:
+ *                       type: integer
+ *                       minimum: 1
+ *                       description: The new position for the step (1-based index)
+ *                       example: 3
+ *                 example:
+ *                   - stepId: "step-id-1"
+ *                     newPosition: 3
+ *                   - stepId: "step-id-2"
+ *                     newPosition: 1
+ *     responses:
+ *       200:
+ *         description: Steps reordered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Steps reordered successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     workflowId:
+ *                       type: string
+ *                       example: "507f1f77bcf86cd799439011"
+ *                     steps:
+ *                       type: array
+ *                       description: The reordered steps with their new positions
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                             example: "step-123"
+ *                           title:
+ *                             type: string
+ *                             example: "Collect Documents"
+ *                           order:
+ *                             type: integer
+ *                             example: 1
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   examples:
+ *                     invalidWorkflowId:
+ *                       value: "Workflow ID must be a valid MongoDB ObjectId"
+ *                     duplicatePosition:
+ *                       value: "Multiple steps cannot have the same position"
+ *                     invalidStepId:
+ *                       value: "Step with ID 'step-xyz' not found in workflow"
+ *                     invalidPosition:
+ *                       value: "Position must be between 1 and total number of steps"
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Access token is required"
+ *       404:
+ *         description: Workflow not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Workflow not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
+router.post('/:id/reorder-steps', verifyUserToken, workflowController.reorderSteps);
+
 module.exports = router;
