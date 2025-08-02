@@ -213,6 +213,7 @@ class WorkflowService {
                     });
                     return {
                         id: step.id || step._id?.toString(),
+                        _id: step._id,
                         title: step.name || step.title,
                         type: step.type,
                         order: step.order || 0,
