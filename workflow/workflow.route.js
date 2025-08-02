@@ -429,7 +429,7 @@ router.get('/:id', verifyUserToken, workflowController.getWorkflowById);
  *                       type: string
  *                     type:
  *                       type: string
- *                       enum: [form, document, approval, email, sms, webhook, condition, delay]
+ *                       enum: [form, document, approval, email, sms, webhook, condition, delay, checklist]
  *                     config:
  *                       type: object
  *                     order:
@@ -757,7 +757,7 @@ router.get('/:id/executions', verifyUserToken, workflowController.getWorkflowExe
  *                 example: "Collect Updated Documents"
  *               type:
  *                 type: string
- *                 enum: [form, document, approval, email, sms, webhook, condition, delay]
+ *                 enum: [form, document, approval, email, sms, webhook, condition, delay, checklist]
  *                 description: Step type
  *                 example: "form"
  *               config:
