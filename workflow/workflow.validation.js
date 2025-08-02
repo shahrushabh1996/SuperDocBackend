@@ -334,7 +334,7 @@ class WorkflowValidation {
                         'string.min': 'Screen title must be at least 1 character',
                         'string.max': 'Screen title cannot exceed 500 characters'
                     }),
-                    otherwise: Joi.forbidden()
+                    otherwise: Joi.optional()
                 }),
                 screenContent: Joi.when('...type', {
                     is: Joi.valid('Screen', 'screen'),
@@ -342,7 +342,11 @@ class WorkflowValidation {
                         'string.empty': 'Screen content cannot be empty',
                         'string.max': 'Screen content cannot exceed 50000 characters'
                     }),
-                    otherwise: Joi.forbidden()
+                    otherwise: Joi.optional()
+                }),
+                // Generic condition field for all step types
+                condition: Joi.string().optional().messages({
+                    'string.base': 'Condition must be a string'
                 }),
                 // Form fields
                 fields: Joi.array().items(
@@ -355,23 +359,53 @@ class WorkflowValidation {
                         validation: Joi.object().optional()
                     })
                 ).optional(),
+                // Document-specific fields (optional for backward compatibility)
                 documentTemplateId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).optional().messages({
                     'string.pattern.base': 'Document Template ID must be a valid MongoDB ObjectId'
                 }),
+                // Future document step fields
+                documents: Joi.array().items(
+                    Joi.object({
+                        name: Joi.string().optional(),
+                        type: Joi.string().optional(),
+                        required: Joi.boolean().optional(),
+                        maxSize: Joi.string().optional()
+                    })
+                ).optional(),
+                maxTotalSize: Joi.string().optional().messages({
+                    'string.base': 'Max total size must be a string (e.g., "50MB")'
+                }),
+                // Checklist-specific fields
+                items: Joi.array().items(
+                    Joi.object({
+                        id: Joi.string().optional(),
+                        text: Joi.string().required(),
+                        completed: Joi.boolean().optional().default(false)
+                    })
+                ).optional(),
+                allowUserToAddItems: Joi.boolean().optional().default(false),
+                // Form-specific fields
+                submitButtonText: Joi.string().optional().messages({
+                    'string.base': 'Submit button text must be a string'
+                }),
+                // Email fields
                 emailTemplate: Joi.object({
                     subject: Joi.string().optional(),
                     body: Joi.string().optional(),
                     attachments: Joi.array().items(Joi.string()).optional()
                 }).optional(),
+                // Delay fields
                 delayDuration: Joi.number().min(0).optional().messages({
                     'number.min': 'Delay duration must be a positive number'
                 }),
+                // Conditional fields
                 conditions: Joi.object().optional(),
+                // Assignment fields
                 assignee: Joi.object({
                     type: Joi.string().valid('contact', 'user', 'role', 'dynamic').required(),
                     value: Joi.string().required()
                 }).optional()
-            }).optional(),
+            }).unknown(true).optional(),
             order: Joi.number().integer().min(0).optional().messages({
                 'number.integer': 'Order must be an integer',
                 'number.min': 'Order must be a positive number'

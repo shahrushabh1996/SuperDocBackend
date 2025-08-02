@@ -87,10 +87,75 @@ const workflowSchema = new mongoose.Schema({
             }
         }],
         config: {
+            // Generic condition field for all step types
+            condition: {
+                type: String
+            },
+            // Document-specific fields
             documentTemplateId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Document'
             },
+            documents: [{
+                name: {
+                    type: String
+                },
+                type: {
+                    type: String
+                },
+                required: {
+                    type: Boolean
+                },
+                maxSize: {
+                    type: String
+                }
+            }],
+            maxTotalSize: {
+                type: String
+            },
+            // Checklist-specific fields
+            items: [{
+                id: {
+                    type: String
+                },
+                text: {
+                    type: String
+                },
+                completed: {
+                    type: Boolean,
+                    default: false
+                }
+            }],
+            allowUserToAddItems: {
+                type: Boolean,
+                default: false
+            },
+            // Form-specific fields
+            submitButtonText: {
+                type: String
+            },
+            fields: [{
+                id: {
+                    type: String
+                },
+                label: {
+                    type: String
+                },
+                type: {
+                    type: String,
+                    enum: ['text', 'email', 'phone', 'date', 'file', 'select', 'checkbox']
+                },
+                required: {
+                    type: Boolean
+                },
+                options: [{
+                    type: String
+                }],
+                validation: {
+                    type: Object
+                }
+            }],
+            // Email-specific fields
             emailTemplate: {
                 subject: {
                     type: String
@@ -102,12 +167,15 @@ const workflowSchema = new mongoose.Schema({
                     type: String
                 }]
             },
+            // Delay-specific fields
             delayDuration: {
                 type: Number
             },
+            // Conditional fields
             conditions: {
                 type: Object
             },
+            // Assignment fields
             assignee: {
                 type: {
                     type: String,
@@ -117,6 +185,7 @@ const workflowSchema = new mongoose.Schema({
                     type: String
                 }
             },
+            // Screen-specific fields
             screenTitle: {
                 type: String
             },
