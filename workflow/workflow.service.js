@@ -41,7 +41,7 @@ class WorkflowService {
                 if (template.steps && template.steps.length > 0) {
                     workflow.steps = template.steps.map(step => ({
                         ...step,
-                        id: uuidv4() // Generate new IDs for cloned steps
+                        _id: uuidv4() // Generate new IDs for cloned steps
                     }));
                 }
                 
@@ -205,14 +205,14 @@ class WorkflowService {
                 // Transform steps array
                 steps: workflow.steps.map(step => {
                     console.log('🔄 [getWorkflowById] Transforming step:', {
-                        id: step.id,
+                        _id: step._id,
                         originalTitle: step.title,
                         originalName: step.name,
                         transformedTitle: step.name || step.title,
                         type: step.type
                     });
                     return {
-                        id: step.id || step._id?.toString(),
+                        id: step._id?.toString(),
                         _id: step._id,
                         title: step.name || step.title,
                         type: step.type,
@@ -300,7 +300,7 @@ class WorkflowService {
             console.log('✅ [updateWorkflow] Found workflow:', {
                 workflowId: workflow._id,
                 existingStepsCount: workflow.steps?.length,
-                existingSteps: workflow.steps?.map(s => ({ id: s.id, title: s.title, name: s.name }))
+                existingSteps: workflow.steps?.map(s => ({ _id: s._id, title: s.title, name: s.name }))
             });
 
             // Handle step actions if provided
@@ -318,7 +318,7 @@ class WorkflowService {
                 updateData.steps = processedSteps;
                 console.log('✅ [updateWorkflow] Processed steps:', {
                     processedStepsCount: processedSteps.length,
-                    processedSteps: processedSteps.map(s => ({ id: s.id, title: s.title, name: s.name }))
+                    processedSteps: processedSteps.map(s => ({ _id: s._id, title: s.title, name: s.name }))
                 });
             }
 
@@ -340,7 +340,7 @@ class WorkflowService {
             console.log('📤 [updateWorkflow] Sending update to MongoDB:', {
                 workflowId,
                 updateDataKeys: Object.keys(updateData),
-                stepsToUpdate: updateData.steps?.map(s => ({ id: s.id, title: s.title, name: s.name })),
+                stepsToUpdate: updateData.steps?.map(s => ({ _id: s._id, title: s.title, name: s.name })),
                 hasStepsInUpdate: !!updateData.steps
             });
 
@@ -360,7 +360,7 @@ class WorkflowService {
 
             console.log('📊 [updateWorkflow] About to save workflow:', {
                 workflowId: workflow._id,
-                stepsToSave: workflow.steps?.map(s => ({ id: s.id, title: s.title, name: s.name }))
+                stepsToSave: workflow.steps?.map(s => ({ _id: s._id, title: s.title, name: s.name }))
             });
 
             const updatedWorkflow = await workflow.save();
@@ -368,7 +368,7 @@ class WorkflowService {
             console.log('✅ [updateWorkflow] MongoDB update complete:', {
                 workflowId: updatedWorkflow._id,
                 updatedStepsCount: updatedWorkflow.steps?.length,
-                updatedSteps: updatedWorkflow.steps?.map(s => ({ id: s.id, title: s.title, name: s.name }))
+                updatedSteps: updatedWorkflow.steps?.map(s => ({ _id: s._id, title: s.title, name: s.name }))
             });
 
             return updatedWorkflow;
@@ -381,7 +381,7 @@ class WorkflowService {
         console.log('🔄 [processStepActions] Starting step processing:', {
             existingStepsCount: existingSteps.length,
             stepActionsCount: stepActions.length,
-            existingSteps: existingSteps.map(s => ({ id: s.id, title: s.title, name: s.name }))
+            existingSteps: existingSteps.map(s => ({ _id: s._id, title: s.title, name: s.name }))
         });
 
         // Create a deep copy of the steps to avoid Mongoose tracking issues
@@ -401,7 +401,7 @@ class WorkflowService {
                 case 'create':
                     // Add new step with generated ID if not provided
                     const newStep = {
-                        id: id || uuidv4(),
+                        _id: id || uuidv4(),
                         title: stepData.title,
                         name: stepData.title, // Map title to name for backward compatibility
                         type: stepData.type,
@@ -419,7 +419,7 @@ class WorkflowService {
                         console.error('❌ [processStepActions] Step ID is required for update action');
                         throw new Error('Step ID is required for update action');
                     }
-                    const stepIndex = steps.findIndex(step => step.id === id);
+                    const stepIndex = steps.findIndex(step => step._id === id);
                     if (stepIndex === -1) {
                         console.error('❌ [processStepActions] Step not found:', { id, existingStepIds: steps.map(s => s.id) });
                         throw new Error(`Step with ID ${id} not found`);
@@ -439,7 +439,7 @@ class WorkflowService {
                     steps[stepIndex] = {
                         ...steps[stepIndex],
                         ...stepData,
-                        id: id, // Preserve the ID
+                        _id: id, // Preserve the _id
                         title: stepData.title || steps[stepIndex].title, // Ensure title is updated
                         name: stepData.title || steps[stepIndex].name // Map title to name if provided
                     };
@@ -461,7 +461,7 @@ class WorkflowService {
                     if (!id) {
                         throw new Error('Step ID is required for delete action');
                     }
-                    const deleteIndex = steps.findIndex(step => step.id === id);
+                    const deleteIndex = steps.findIndex(step => step._id === id);
                     if (deleteIndex === -1) {
                         throw new Error(`Step with ID ${id} not found`);
                     }
@@ -476,7 +476,7 @@ class WorkflowService {
         console.log('🎯 [processStepActions] Final processed steps:', {
             totalSteps: steps.length,
             steps: steps.map(s => ({
-                id: s.id,
+                _id: s._id,
                 title: s.title,
                 name: s.name,
                 type: s.type,
@@ -589,7 +589,7 @@ class WorkflowService {
                     const stepObj = step.toObject ? step.toObject() : step;
                     return {
                         ...stepObj,
-                        id: uuidv4() // Generate new IDs for steps to avoid conflicts
+                        _id: uuidv4() // Generate new IDs for steps to avoid conflicts
                     };
                 });
             } else {
@@ -782,7 +782,6 @@ class WorkflowService {
 
             console.log('Found workflow:', workflow.title);
             console.log('Current steps:', workflow.steps.map(s => ({
-                id: s.id,
                 _id: s._id ? s._id.toString() : 'NO_ID',
                 name: s.name,
                 type: s.type
@@ -892,7 +891,6 @@ class WorkflowService {
 
             console.log('Workflow updated successfully');
             console.log('Updated workflow steps:', updatedWorkflow.steps.map(s => ({
-                id: s.id,
                 _id: s._id ? s._id.toString() : 'NO_ID',
                 name: s.name,
                 type: s.type
@@ -900,7 +898,7 @@ class WorkflowService {
 
             // Find and return the updated step
             console.log('Looking for step with id:', stepId);
-            console.log('Available steps:', updatedWorkflow.steps.map(s => ({ id: s.id, _id: s._id })));
+            console.log('Available steps:', updatedWorkflow.steps.map(s => ({ _id: s._id })));
             
             const finalUpdatedStep = updatedWorkflow.steps.find(step => 
                 step._id && step._id.toString() === stepId
@@ -1136,7 +1134,7 @@ class WorkflowService {
                     const views = await WorkflowExecution.countDocuments({
                         workflowId,
                         organizationId,
-                        'stepExecutions.stepId': step.id
+                        'stepExecutions.stepId': step._id
                     });
 
                     // Count completions (executions that completed this step)
@@ -1145,7 +1143,7 @@ class WorkflowService {
                         organizationId,
                         'stepExecutions': {
                             $elemMatch: {
-                                stepId: step.id,
+                                stepId: step._id,
                                 status: 'completed'
                             }
                         }
@@ -1155,7 +1153,7 @@ class WorkflowService {
                         Math.round(((views - completions) / views) * 100 * 10) / 10 : 0;
 
                     stepAnalytics.push({
-                        stepId: step.id,
+                        stepId: step._id,
                         stepTitle: step.name || step.title || `Step ${step.order || 1}`,
                         views,
                         completions,
@@ -1198,7 +1196,7 @@ class WorkflowService {
             }
 
             // 2. Validate all step IDs exist
-            const existingStepIds = workflow.steps.map(step => step.id);
+            const existingStepIds = workflow.steps.map(step => step._id);
             const instructionStepIds = reorderInstructions.map(instruction => instruction.stepId);
             
             for (const instruction of reorderInstructions) {
@@ -1233,8 +1231,8 @@ class WorkflowService {
             
             // Sort steps based on new positions
             reorderedSteps.sort((a, b) => {
-                const posA = positionMap.has(a.id) ? positionMap.get(a.id) : a.order || 999;
-                const posB = positionMap.has(b.id) ? positionMap.get(b.id) : b.order || 999;
+                const posA = positionMap.has(a._id) ? positionMap.get(a._id) : a.order || 999;
+                const posB = positionMap.has(b._id) ? positionMap.get(b._id) : b.order || 999;
                 
                 if (posA === posB) {
                     // If same position (shouldn't happen with validation), maintain original order
@@ -1259,7 +1257,7 @@ class WorkflowService {
             return {
                 workflowId: workflow._id.toString(),
                 steps: reorderedSteps.map(step => ({
-                    id: step.id,
+                    id: step._id,
                     title: step.name || step.title,
                     order: step.order
                 }))
@@ -1285,7 +1283,7 @@ class WorkflowService {
 
             // 2. If stepId provided, verify it exists in workflow
             if (stepId && workflow.steps) {
-                const stepExists = workflow.steps.some(step => step.id === stepId);
+                const stepExists = workflow.steps.some(step => step._id === stepId);
                 if (!stepExists) {
                     throw new Error('Step not found in workflow');
                 }

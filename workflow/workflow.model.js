@@ -116,6 +116,12 @@ const workflowSchema = new mongoose.Schema({
                 value: {
                     type: String
                 }
+            },
+            screenTitle: {
+                type: String
+            },
+            screenContent: {
+                type: String
             }
         },
         nextSteps: [{
