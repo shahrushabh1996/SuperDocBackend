@@ -1295,7 +1295,7 @@ class WorkflowService {
 
             // 2. If stepId provided, verify it exists in workflow
             if (stepId && workflow.steps) {
-                const stepExists = workflow.steps.some(step => step._id === stepId);
+                const stepExists = workflow.steps.some(step => step._id && step._id.toString() === stepId);
                 if (!stepExists) {
                     throw new Error('Step not found in workflow');
                 }
