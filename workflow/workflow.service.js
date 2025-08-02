@@ -219,6 +219,7 @@ class WorkflowService {
                         order: step.order || 0,
                         required: step.required || false,
                         fields: step.config?.fields || [],
+                        config: step.config || {},
                         createdAt: workflow.createdAt,
                         updatedAt: workflow.updatedAt
                     };

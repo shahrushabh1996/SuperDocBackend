@@ -84,8 +84,8 @@ class WorkflowValidation {
             description: Joi.string().trim().max(1000).optional().allow('').messages({
                 'string.max': 'Description cannot exceed 1000 characters'
             }),
-            status: Joi.string().valid('draft', 'active', 'paused', 'archived').optional().messages({
-                'any.only': 'Status must be one of: draft, active, paused, archived'
+            status: Joi.string().valid('active', 'archived').optional().messages({
+                'any.only': 'Status must be one of: active, archived'
             }),
             templateId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).optional().messages({
                 'string.pattern.base': 'Template ID must be a valid MongoDB ObjectId'
@@ -239,7 +239,7 @@ class WorkflowValidation {
             page: Joi.number().integer().min(1).optional().default(1),
             limit: Joi.number().integer().min(1).max(100).optional().default(20),
             search: Joi.string().optional().allow(''),
-            status: Joi.string().valid('draft', 'active', 'paused', 'archived').optional(),
+            status: Joi.string().valid('active', 'archived').optional(),
             sortBy: Joi.string().valid('title', 'createdAt', 'updatedAt').optional().default('createdAt'),
             sortOrder: Joi.string().valid('asc', 'desc').optional().default('desc')
         });

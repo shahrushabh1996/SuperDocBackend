@@ -24,8 +24,8 @@ const workflowSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['draft', 'active', 'paused', 'archived'],
-        default: 'draft'
+        enum: ['active', 'archived'],
+        default: 'active'
     },
     trigger: {
         type: {
