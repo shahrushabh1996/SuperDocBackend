@@ -798,8 +798,16 @@ class WorkflowService {
                 throw new Error('Step not found');
             }
 
-            // Create updated step object
-            const updatedStep = { ...workflow.steps[stepIndex] };
+            // Create updated step object - preserve the _id
+            const updatedStep = workflow.steps[stepIndex].toObject ? 
+                workflow.steps[stepIndex].toObject() : 
+                { ...workflow.steps[stepIndex] };
+            
+            // IMPORTANT: Preserve the original _id
+            updatedStep._id = workflow.steps[stepIndex]._id;
+            
+            console.log('Original step _id:', workflow.steps[stepIndex]._id);
+            console.log('Updated step _id before changes:', updatedStep._id);
 
             // Update fields if provided
             if (stepData.name !== undefined) {
@@ -823,6 +831,8 @@ class WorkflowService {
             if (stepData.nextSteps !== undefined) {
                 updatedStep.nextSteps = stepData.nextSteps;
             }
+            
+            console.log('Updated step _id after changes:', updatedStep._id);
 
             // Handle order change - this requires reordering steps
             if (stepData.order !== undefined && stepData.order !== updatedStep.order) {
@@ -855,6 +865,9 @@ class WorkflowService {
                 // Just update the step without reordering
                 workflow.steps[stepIndex] = updatedStep;
             }
+            
+            // Double-check that _id is preserved in the array
+            console.log('Step _id in array after assignment:', workflow.steps[stepIndex]._id);
 
             console.log('About to update workflow with steps:', workflow.steps.map(s => ({
                 _id: s._id ? s._id.toString() : 'NO_ID',
