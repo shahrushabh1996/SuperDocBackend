@@ -211,7 +211,7 @@ class WorkflowService {
                         transformedTitle: step.name || step.title,
                         type: step.type
                     });
-                    return {
+                    const transformedStep = {
                         id: step._id?.toString(),
                         _id: step._id,
                         title: step.name || step.title,
@@ -222,6 +222,18 @@ class WorkflowService {
                         createdAt: workflow.createdAt,
                         updatedAt: workflow.updatedAt
                     };
+                    
+                    // Add screen-specific fields if it's a Screen type
+                    if (step.type && step.type.toLowerCase() === 'screen') {
+                        if (step.config?.screenTitle) {
+                            transformedStep.screenTitle = step.config.screenTitle;
+                        }
+                        if (step.config?.screenContent) {
+                            transformedStep.screenContent = step.config.screenContent;
+                        }
+                    }
+                    
+                    return transformedStep;
                 }),
 
                 // Ensure settings object includes all required fields
