@@ -460,7 +460,7 @@ class WorkflowController {
                 success: true,
                 message: 'Workflow step updated successfully',
                 data: {
-                    id: updatedStep.id,
+                    _id: updatedStep._id,
                     name: updatedStep.name,
                     type: updatedStep.type,
                     order: updatedStep.order,

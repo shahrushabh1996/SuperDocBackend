@@ -774,9 +774,9 @@ class WorkflowService {
                 throw new Error('Workflow not found');
             }
 
-            // Find the step to update (check both id and _id)
+            // Find the step to update (only use _id)
             const stepIndex = workflow.steps.findIndex(step => 
-                step.id === stepId || (step._id && step._id.toString() === stepId)
+                step._id && step._id.toString() === stepId
             );
             if (stepIndex === -1) {
                 throw new Error('Step not found');
@@ -860,7 +860,7 @@ class WorkflowService {
             console.log('Available steps:', updatedWorkflow.steps.map(s => ({ id: s.id, _id: s._id })));
             
             const finalUpdatedStep = updatedWorkflow.steps.find(step => 
-                step.id === stepId || (step._id && step._id.toString() === stepId)
+                step._id && step._id.toString() === stepId
             );
             
             if (!finalUpdatedStep) {
@@ -886,8 +886,10 @@ class WorkflowService {
                 throw new Error('Workflow not found');
             }
 
-            // Find the step to delete
-            const stepIndex = workflow.steps.findIndex(step => step.id === stepId);
+            // Find the step to delete (only use _id)
+            const stepIndex = workflow.steps.findIndex(step => 
+                step._id && step._id.toString() === stepId
+            );
             if (stepIndex === -1) {
                 throw new Error('Step not found');
             }
