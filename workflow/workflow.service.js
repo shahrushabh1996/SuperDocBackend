@@ -764,6 +764,11 @@ class WorkflowService {
 
     async updateWorkflowStep(workflowId, stepId, stepData, userId, organizationId) {
         try {
+            console.log('=== WORKFLOW UPDATE START ===');
+            console.log('Workflow ID:', workflowId);
+            console.log('Step ID to update:', stepId);
+            console.log('Step Data:', JSON.stringify(stepData, null, 2));
+            
             // First, verify the workflow exists and belongs to the organization
             const workflow = await Workflow.findOne({
                 _id: workflowId,
@@ -775,11 +780,21 @@ class WorkflowService {
                 throw new Error('Workflow not found');
             }
 
+            console.log('Found workflow:', workflow.title);
+            console.log('Current steps:', workflow.steps.map(s => ({
+                id: s.id,
+                _id: s._id ? s._id.toString() : 'NO_ID',
+                name: s.name,
+                type: s.type
+            })));
+
             // Find the step to update (only use _id)
             const stepIndex = workflow.steps.findIndex(step => 
                 step._id && step._id.toString() === stepId
             );
             if (stepIndex === -1) {
+                console.log('ERROR: Step not found. Looking for:', stepId);
+                console.log('Available step IDs:', workflow.steps.map(s => s._id ? s._id.toString() : 'NO_ID'));
                 throw new Error('Step not found');
             }
 
@@ -841,6 +856,12 @@ class WorkflowService {
                 workflow.steps[stepIndex] = updatedStep;
             }
 
+            console.log('About to update workflow with steps:', workflow.steps.map(s => ({
+                _id: s._id ? s._id.toString() : 'NO_ID',
+                name: s.name,
+                order: s.order
+            })));
+
             // Update the workflow
             const updatedWorkflow = await Workflow.findByIdAndUpdate(
                 workflowId,
@@ -856,6 +877,14 @@ class WorkflowService {
                 throw new Error('Failed to update workflow');
             }
 
+            console.log('Workflow updated successfully');
+            console.log('Updated workflow steps:', updatedWorkflow.steps.map(s => ({
+                id: s.id,
+                _id: s._id ? s._id.toString() : 'NO_ID',
+                name: s.name,
+                type: s.type
+            })));
+
             // Find and return the updated step
             console.log('Looking for step with id:', stepId);
             console.log('Available steps:', updatedWorkflow.steps.map(s => ({ id: s.id, _id: s._id })));
@@ -865,9 +894,16 @@ class WorkflowService {
             );
             
             if (!finalUpdatedStep) {
+                console.log('ERROR: Updated step not found!');
+                console.log('Looking for stepId:', stepId);
+                console.log('Step IDs after update:', updatedWorkflow.steps.map(s => ({
+                    _id: s._id ? s._id.toString() : 'NO_ID',
+                    matches: s._id ? s._id.toString() === stepId : false
+                })));
                 throw new Error(`Updated step not found with id: ${stepId}`);
             }
             
+            console.log('Found updated step:', finalUpdatedStep.name);
             return finalUpdatedStep;
         } catch (error) {
             throw new Error(`Failed to update workflow step: ${error.message}`);
