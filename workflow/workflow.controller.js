@@ -690,6 +690,73 @@ class WorkflowController {
             });
         }
     }
+
+    async addWorkflowStep(req, res) {
+        try {
+            // Combine params and body for validation
+            const requestData = {
+                id: req.params.id,
+                ...req.body
+            };
+
+            // Validate request
+            const { error, value } = await workflowValidation.addWorkflowStep(requestData);
+            if (error) {
+                return res.status(400).json({
+                    success: false,
+                    message: error.details[0].message
+                });
+            }
+
+            const userId = req.user.userId;
+            const organizationId = req.user.organizationId;
+
+            // Extract workflow ID from validated data
+            const { id, ...stepData } = value;
+
+            // Add step through service
+            const newStep = await workflowService.addWorkflowStep(
+                id,
+                stepData,
+                userId,
+                organizationId
+            );
+
+            return res.status(201).json({
+                success: true,
+                message: 'Workflow step added successfully',
+                data: {
+                    _id: newStep._id,
+                    id: newStep.id,
+                    title: newStep.title || newStep.name,
+                    type: newStep.type,
+                    order: newStep.order,
+                    required: newStep.required,
+                    config: newStep.config,
+                    nextSteps: newStep.nextSteps
+                }
+            });
+
+        } catch (error) {
+            console.error('Error adding workflow step:', error);
+            if (error.message === 'Workflow not found') {
+                return res.status(404).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            if (error.message === 'Step ID already exists in workflow') {
+                return res.status(400).json({
+                    success: false,
+                    message: error.message
+                });
+            }
+            return res.status(500).json({
+                success: false,
+                message: 'Internal server error'
+            });
+        }
+    }
 }
 
 module.exports = new WorkflowController();

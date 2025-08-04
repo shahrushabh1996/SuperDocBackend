@@ -511,6 +511,96 @@ class WorkflowValidation {
         });
         return schema.validate(data);
     }
+
+    async addWorkflowStep(data) {
+        const schema = Joi.object({
+            id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required().messages({
+                'string.pattern.base': 'Workflow ID must be a valid MongoDB ObjectId'
+            }),
+            stepId: Joi.string().required().messages({
+                'string.empty': 'Step ID is required',
+                'any.required': 'Step ID is required'
+            }),
+            title: Joi.string().trim().min(1).max(200).required().messages({
+                'string.empty': 'Step title is required',
+                'string.min': 'Step title must be at least 1 character',
+                'string.max': 'Step title cannot exceed 200 characters',
+                'any.required': 'Step title is required'
+            }),
+            type: Joi.string().valid('form', 'document', 'documents', 'screen', 'approval', 'email', 'sms', 'webhook', 'condition', 'delay', 'checklist').required().messages({
+                'any.only': 'Type must be one of: form, document, documents, screen, approval, email, sms, webhook, condition, delay, checklist',
+                'any.required': 'Step type is required'
+            }),
+            required: Joi.boolean().optional().default(false).messages({
+                'boolean.base': 'Required must be a boolean value'
+            }),
+            order: Joi.number().integer().min(1).optional().messages({
+                'number.base': 'Order must be a number',
+                'number.integer': 'Order must be an integer',
+                'number.min': 'Order must be at least 1'
+            }),
+            config: Joi.object({
+                // Screen-specific fields
+                screenTitle: Joi.when('...type', {
+                    is: 'screen',
+                    then: Joi.string().trim().min(1).max(500).optional().messages({
+                        'string.empty': 'Screen title cannot be empty',
+                        'string.min': 'Screen title must be at least 1 character',
+                        'string.max': 'Screen title cannot exceed 500 characters'
+                    }),
+                    otherwise: Joi.optional()
+                }),
+                screenContent: Joi.when('...type', {
+                    is: 'screen',
+                    then: Joi.string().max(50000).optional().messages({
+                        'string.empty': 'Screen content cannot be empty',
+                        'string.max': 'Screen content cannot exceed 50000 characters'
+                    }),
+                    otherwise: Joi.optional()
+                }),
+                // Form fields
+                fields: Joi.array().items(
+                    Joi.object({
+                        id: Joi.string().optional(),
+                        label: Joi.string().required(),
+                        type: Joi.string().valid('text', 'email', 'phone', 'date', 'file', 'select', 'checkbox').required(),
+                        required: Joi.boolean().optional().default(false),
+                        options: Joi.array().items(Joi.string()).optional(),
+                        validation: Joi.object().optional()
+                    })
+                ).optional(),
+                // Document-specific fields
+                documentTemplateId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).optional().messages({
+                    'string.pattern.base': 'Document Template ID must be a valid MongoDB ObjectId'
+                }),
+                // Email fields
+                emailTemplate: Joi.object({
+                    subject: Joi.string().optional(),
+                    body: Joi.string().optional(),
+                    attachments: Joi.array().items(Joi.string()).optional()
+                }).optional(),
+                // Delay fields
+                delayDuration: Joi.number().min(0).optional().messages({
+                    'number.min': 'Delay duration must be a positive number'
+                }),
+                // Conditional fields
+                conditions: Joi.object().optional(),
+                // Assignment fields
+                assignee: Joi.object({
+                    type: Joi.string().valid('contact', 'user', 'role', 'dynamic').required(),
+                    value: Joi.string().required()
+                }).optional()
+            }).unknown(true).optional(),
+            nextSteps: Joi.array().items(
+                Joi.object({
+                    stepId: Joi.string().required(),
+                    condition: Joi.object().optional()
+                })
+            ).optional()
+        });
+
+        return schema.validate(data);
+    }
 }
 
 module.exports = new WorkflowValidation();

@@ -930,6 +930,153 @@ router.put('/:id/steps/:stepId', verifyUserToken, workflowController.updateWorkf
 
 /**
  * @swagger
+ * /workflows/{id}/steps:
+ *   post:
+ *     summary: Add a new step to a workflow
+ *     tags: [Workflows]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Workflow ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - stepId
+ *               - title
+ *               - type
+ *             properties:
+ *               stepId:
+ *                 type: string
+ *                 description: Unique identifier for the step
+ *                 example: "step-123"
+ *               title:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 200
+ *                 description: Step title
+ *                 example: "Collect Documents"
+ *               type:
+ *                 type: string
+ *                 enum: [form, document, approval, email, sms, webhook, condition, delay, checklist, screen]
+ *                 description: Step type
+ *                 example: "form"
+ *               required:
+ *                 type: boolean
+ *                 description: Whether the step is required
+ *                 default: false
+ *                 example: false
+ *               order:
+ *                 type: number
+ *                 description: Step order (optional, defaults to last position)
+ *                 example: 3
+ *               config:
+ *                 type: object
+ *                 description: Step configuration
+ *                 properties:
+ *                   fields:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         label:
+ *                           type: string
+ *                           example: "Full Name"
+ *                         type:
+ *                           type: string
+ *                           enum: [text, email, phone, date, file, select, checkbox]
+ *                           example: "text"
+ *                         required:
+ *                           type: boolean
+ *                           example: true
+ *               nextSteps:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     stepId:
+ *                       type: string
+ *                     condition:
+ *                       type: object
+ *                 description: Next steps configuration
+ *     responses:
+ *       201:
+ *         description: Step added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Workflow step added successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "507f1f77bcf86cd799439011"
+ *                     id:
+ *                       type: string
+ *                       example: "step-123"
+ *                     title:
+ *                       type: string
+ *                       example: "Collect Documents"
+ *                     type:
+ *                       type: string
+ *                       example: "form"
+ *                     order:
+ *                       type: number
+ *                       example: 3
+ *                     required:
+ *                       type: boolean
+ *                       example: false
+ *                     config:
+ *                       type: object
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Step title is required"
+ *       404:
+ *         description: Workflow not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Workflow not found"
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/:id/steps', verifyUserToken, workflowController.addWorkflowStep);
+
+/**
+ * @swagger
  * /workflows/{id}/steps/{stepId}:
  *   delete:
  *     summary: Delete a workflow step

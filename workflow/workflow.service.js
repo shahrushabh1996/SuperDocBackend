@@ -4,6 +4,7 @@ const WorkflowExecution = require('../workflowExecution/workflowExecution.model'
 const { v4: uuidv4 } = require('uuid');
 const utils = require('../common/utils');
 const sanitizer = require('../utils/sanitizer');
+const mongoose = require('mongoose');
 
 class WorkflowService {
     
@@ -1355,6 +1356,111 @@ class WorkflowService {
         } catch (error) {
             console.error('[WorkflowService] Error generating presigned URL:', error);
             throw error;
+        }
+    }
+
+    async addWorkflowStep(workflowId, stepData, userId, organizationId) {
+        try {
+            console.log('📝 [addWorkflowStep] Adding new step to workflow:', {
+                workflowId,
+                stepData: {
+                    title: stepData.title,
+                    type: stepData.type,
+                    order: stepData.order,
+                    required: stepData.required
+                }
+            });
+
+            // 1. Fetch the workflow
+            const workflow = await Workflow.findOne({
+                _id: workflowId,
+                organizationId,
+                deletedAt: { $exists: false }
+            });
+
+            if (!workflow) {
+                throw new Error('Workflow not found');
+            }
+
+            // 2. Check if step ID already exists
+            const existingStep = workflow.steps.find(step => step.id === stepData.stepId);
+            if (existingStep) {
+                throw new Error('Step ID already exists in workflow');
+            }
+
+            // 3. Determine step order
+            let stepOrder = stepData.order;
+            if (!stepOrder) {
+                // Auto-append to end
+                stepOrder = workflow.steps.length + 1;
+            } else {
+                // If explicit order provided, shift existing steps
+                workflow.steps.forEach(step => {
+                    if (step.order >= stepOrder) {
+                        step.order += 1;
+                    }
+                });
+            }
+
+            // 4. Create the new step object
+            const newStep = {
+                _id: new mongoose.Types.ObjectId(), // Generate MongoDB ObjectId
+                id: stepData.stepId, // Use provided stepId as id field
+                title: stepData.title,
+                name: stepData.title, // Map title to name for backward compatibility
+                type: stepData.type,
+                order: stepOrder,
+                required: stepData.required || false,
+                config: stepData.config || {},
+                nextSteps: stepData.nextSteps || [],
+                fields: stepData.config?.fields || []
+            };
+
+            // 5. Handle type-specific config sanitization
+            if (stepData.type && stepData.type.toLowerCase() === 'screen' && stepData.config) {
+                if (stepData.config.screenContent) {
+                    newStep.config.screenContent = sanitizer.sanitizeScreenContent(stepData.config.screenContent);
+                }
+            }
+
+            console.log('✅ [addWorkflowStep] New step created:', {
+                _id: newStep._id,
+                id: newStep.id,
+                title: newStep.title,
+                order: newStep.order
+            });
+
+            // 6. Add step to workflow
+            workflow.steps.push(newStep);
+            
+            // Sort steps by order
+            workflow.steps.sort((a, b) => a.order - b.order);
+
+            // 7. Update workflow metadata
+            workflow.updatedBy = userId;
+            workflow.updatedAt = new Date();
+            workflow.markModified('steps');
+
+            // 8. Save the workflow
+            const updatedWorkflow = await workflow.save();
+
+            console.log('💾 [addWorkflowStep] Workflow saved with new step:', {
+                workflowId: updatedWorkflow._id,
+                totalSteps: updatedWorkflow.steps.length
+            });
+
+            // 9. Find and return the newly added step
+            const addedStep = updatedWorkflow.steps.find(step => step._id.toString() === newStep._id.toString());
+            
+            if (!addedStep) {
+                throw new Error('Failed to retrieve newly added step');
+            }
+
+            return addedStep;
+
+        } catch (error) {
+            console.error('❌ [addWorkflowStep] Error:', error);
+            throw new Error(`Failed to add workflow step: ${error.message}`);
         }
     }
 }
