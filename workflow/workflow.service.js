@@ -1408,7 +1408,7 @@ class WorkflowService {
                 id: stepData.stepId, // Use provided stepId as id field
                 title: stepData.title,
                 name: stepData.title, // Map title to name for backward compatibility
-                type: stepData.type,
+                type: stepData.type.toLowerCase(), // Ensure lowercase for consistency
                 order: stepOrder,
                 required: stepData.required || false,
                 config: stepData.config || {},

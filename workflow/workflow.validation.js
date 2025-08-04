@@ -527,10 +527,14 @@ class WorkflowValidation {
                 'string.max': 'Step title cannot exceed 200 characters',
                 'any.required': 'Step title is required'
             }),
-            type: Joi.string().valid('form', 'document', 'documents', 'screen', 'approval', 'email', 'sms', 'webhook', 'condition', 'delay', 'checklist').required().messages({
-                'any.only': 'Type must be one of: form, document, documents, screen, approval, email, sms, webhook, condition, delay, checklist',
-                'any.required': 'Step type is required'
-            }),
+            type: Joi.string()
+                .lowercase()
+                .valid('form', 'document', 'documents', 'screen', 'approval', 'email', 'sms', 'webhook', 'condition', 'delay', 'checklist')
+                .required()
+                .messages({
+                    'any.only': 'Type must be one of: form, document, documents, screen, approval, email, sms, webhook, condition, delay, checklist',
+                    'any.required': 'Step type is required'
+                }),
             required: Joi.boolean().optional().default(false).messages({
                 'boolean.base': 'Required must be a boolean value'
             }),
