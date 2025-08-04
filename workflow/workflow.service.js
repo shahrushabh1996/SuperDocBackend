@@ -1209,7 +1209,7 @@ class WorkflowService {
             }
 
             // 2. Validate all step IDs exist
-            const existingStepIds = workflow.steps.map(step => step._id);
+            const existingStepIds = workflow.steps.map(step => step._id.toString());
             const instructionStepIds = reorderInstructions.map(instruction => instruction.stepId);
             
             for (const instruction of reorderInstructions) {
@@ -1244,8 +1244,8 @@ class WorkflowService {
             
             // Sort steps based on new positions
             reorderedSteps.sort((a, b) => {
-                const posA = positionMap.has(a._id) ? positionMap.get(a._id) : a.order || 999;
-                const posB = positionMap.has(b._id) ? positionMap.get(b._id) : b.order || 999;
+                const posA = positionMap.has(a._id.toString()) ? positionMap.get(a._id.toString()) : a.order || 999;
+                const posB = positionMap.has(b._id.toString()) ? positionMap.get(b._id.toString()) : b.order || 999;
                 
                 if (posA === posB) {
                     // If same position (shouldn't happen with validation), maintain original order
@@ -1270,7 +1270,7 @@ class WorkflowService {
             return {
                 workflowId: workflow._id.toString(),
                 steps: reorderedSteps.map(step => ({
-                    id: step._id,
+                    id: step._id.toString(),
                     title: step.name || step.title,
                     order: step.order
                 }))
